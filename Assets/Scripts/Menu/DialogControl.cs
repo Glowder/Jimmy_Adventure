@@ -19,7 +19,7 @@ public class DialogControl : MonoBehaviour
                                       dialogTextBox,
                                       nameTextBox;
   #endregion
-  [SerializeField] int currentDialogIndex, dialogLength = 4;
+  [SerializeField] int currentDialogIndex, dialogLength;
   [SerializeField] string[] dialog;
   // Start is called once before the first execution of Update after the MonoBehaviour is created
   void Start()
@@ -30,6 +30,7 @@ public class DialogControl : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    dialogLength = Player.instance.GetDialogLength()+dialog.Length;
     if (Input.GetKeyDown(KeyCode.E))
     {
       dialogText.text = dialog[0];

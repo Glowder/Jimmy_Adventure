@@ -40,26 +40,23 @@ public class Player : MonoBehaviour
   // Handles the player movement and animations.
   private void PlayerMovement()
   {
+    DeactivateMovementAndAnimation();
+
     // Gets the player input from the Input Manager.
     float horizontalMovement = Input.GetAxis("Horizontal");
     float verticalMovement = Input.GetAxis("Vertical");
 
     // Sets the player animator parameters to control the animations.
-    if (DialogControl.instance != null)
+
+    playerAnimator.SetFloat("walk_x", playerRigidBody.linearVelocity.x);
+    playerAnimator.SetFloat("walk_y", playerRigidBody.linearVelocity.y);
+
+
+    // Sets the last direction the player moved in.
+    if (horizontalMovement != 0 || verticalMovement != 0)
     {
-      if (!DialogControl.instance.dialogBox.activeInHierarchy && !DialogControl.instance.dialogWithNameBox.activeInHierarchy)
-      {
-        playerAnimator.SetFloat("walk_x", playerRigidBody.linearVelocity.x);
-        playerAnimator.SetFloat("walk_y", playerRigidBody.linearVelocity.y);
-  
-  
-        // Sets the last direction the player moved in.
-        if (horizontalMovement != 0 || verticalMovement != 0)
-        {
-          playerAnimator.SetFloat("lastPos_x", horizontalMovement);
-          playerAnimator.SetFloat("lastPos_y", verticalMovement);
-        }
-      }
+      playerAnimator.SetFloat("lastPos_x", horizontalMovement);
+      playerAnimator.SetFloat("lastPos_y", verticalMovement);
     }
 
     // Player runs when Left Shift is pressed.
@@ -70,20 +67,15 @@ public class Player : MonoBehaviour
     verticalMove = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) && !horizontalMove ? true : false;
 
     // Player moves at one axis at a time, depending on whitch axis is locked.
-    if (DialogControl.instance != null)
-    {
-      if (!DialogControl.instance.dialogBox.activeInHierarchy && !DialogControl.instance.dialogWithNameBox.activeInHierarchy)
-      {
-        if (!verticalMove)
-        {
-          playerRigidBody.linearVelocity = new Vector2(horizontalMovement, 0f) * moveSpeed;
-        }
 
-        if (!horizontalMove)
-        {
-          playerRigidBody.linearVelocity = new Vector2(0f, verticalMovement) * moveSpeed;
-        }
-      }
+    if (!verticalMove)
+    {
+      playerRigidBody.linearVelocity = new Vector2(horizontalMovement, 0f) * moveSpeed;
+    }
+
+    if (!horizontalMove)
+    {
+      playerRigidBody.linearVelocity = new Vector2(0f, verticalMovement) * moveSpeed;
     }
 
     // Clamp player position to map edges so the player can´t walt outside the map.
@@ -121,6 +113,28 @@ public class Player : MonoBehaviour
   public Sprite GetPlayerPortrait()
   {
     return gameObject.GetComponent<SpriteRenderer>().sprite;
+  }
+
+  public int GetDialogLength()
+  {
+    return dialog.Length;
+  }
+
+  // Checks if the dialog box is active and disables player movement and animation if ture.
+  // If false the player movement and animation is enabled again.
+  private void DeactivateMovementAndAnimation()
+  {
+    if (DialogControl.instance.dialogBox.activeInHierarchy || DialogControl.instance.dialogWithNameBox.activeInHierarchy)
+    {
+      playerAnimator.enabled = false;
+      playerRigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
+    }
+    else
+    {
+      playerAnimator.enabled = true;
+      playerRigidBody.constraints = RigidbodyConstraints2D.None;
+      playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
   }
 }
 
