@@ -246,7 +246,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
       propertyPath: dialog.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
       propertyPath: 'dialog.Array.data[0]'
@@ -586,12 +586,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1294452095}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47b1c060748e6a242a537b23022a85f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
-  dialog: []
+  dialog:
+  - '#NPC'
+  - I have Items!
+  - '#Player'
+  - I Have Kohle
+  - '#NPC'
+  - Give me Kohle!
+  - '#Player'
+  - Give me Item!
 --- !u!1001 &1491255945
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -659,8 +667,36 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 488525515034743551, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1491255947}
   m_SourcePrefab: {fileID: 100100000, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+--- !u!1 &1491255946 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 488525515034743551, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+  m_PrefabInstance: {fileID: 1491255945}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1491255947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1491255946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47b1c060748e6a242a537b23022a85f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
+  dialog:
+  - '#NPC'
+  - Hello horny boy!
+  - Need food?
+  - '#Player'
+  - Hunger!
+  - '#NPC'
+  - Money!
 --- !u!4 &1770364178 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1209075829210200688, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
@@ -8840,8 +8876,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449473851280496239, guid: 41efe57b5c2389a439c18f6faa319283, type: 3}
+      propertyPath: dialogLength
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5449473851280496239, guid: 41efe57b5c2389a439c18f6faa319283, type: 3}
       propertyPath: dialog.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449473851280496239, guid: 41efe57b5c2389a439c18f6faa319283, type: 3}
       propertyPath: 'dialog.Array.data[0]'
@@ -8915,8 +8955,38 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 488525515034743551, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4376258519287095139}
   m_SourcePrefab: {fileID: 100100000, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+--- !u!1 &4376258519287095138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 488525515034743551, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+  m_PrefabInstance: {fileID: 4376258519287095137}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4376258519287095139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4376258519287095138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47b1c060748e6a242a537b23022a85f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
+  dialog:
+  - '#NPC'
+  - Generic greetings!
+  - Generic question?
+  - '#Player'
+  - Generic Hero!
+  - '#NPC'
+  - Generic praise
+  - '#Player'
+  - Cringe monolog...
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
