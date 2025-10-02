@@ -26,7 +26,7 @@ public class PlayerStats : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
-
+    PlayerLevelingManagement();
   }
 
   private void CreateInstance()
@@ -62,5 +62,43 @@ public class PlayerStats : MonoBehaviour
 
       requiredXPForEachLevel.Add(xp);
     }
+  }
+
+  private void PlayerLevelingManagement()
+  {
+    if (currentLevel < maxLevel)
+    {
+      if (Input.GetKeyDown(KeyCode.L))
+        currentXP += currentLevel * 100;
+
+      if (currentXP >= requiredXPForEachLevel[currentLevel - 1])
+      {
+        currentXP -= requiredXPForEachLevel[currentLevel - 1];
+        currentLevel++;
+        Debug.Log($"Player leveled up! New Level: {currentLevel}");
+        Debug.Log($"Reqired XP for next level: {requiredXPForEachLevel[currentLevel - 1]}");
+        AddStatsAfterLevelUp();
+      }
+      if (currentLevel == maxLevel)
+        currentXP = 0;
+
+    }
+  }
+
+  public void AddStatsAfterLevelUp()
+  {
+    maxHP += Mathf.FloorToInt(Mathf.Sqrt(currentLevel * 2.73f) * Mathf.Sqrt(currentLevel * 1.19f));
+
+    maxMP += Mathf.FloorToInt(Mathf.Sqrt(currentLevel * 0.73f) * Mathf.Sqrt(currentLevel * 1.19f));
+
+    strength += Mathf.FloorToInt(Mathf.Sqrt(currentLevel * 0.23f) * Mathf.Sqrt(currentLevel * 0.39f));
+
+    intelligence += Mathf.FloorToInt(Mathf.Sqrt(currentLevel * 0.33f) * Mathf.Sqrt(currentLevel * 0.59f));
+
+    dexterity += 2;
+
+    physicalDEF = Mathf.FloorToInt(strength * 1.23f);
+
+    magicalDEF = Mathf.FloorToInt(intelligence * 1.35f);
   }
 }

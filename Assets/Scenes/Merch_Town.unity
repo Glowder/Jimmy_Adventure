@@ -233,6 +233,10 @@ PrefabInstance:
       value: Jimmy
       objectReference: {fileID: 0}
     - target: {fileID: 6319534386395621612, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
+      propertyPath: currentLevel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6319534386395621612, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
       propertyPath: playerPortrait
       value: 
       objectReference: {fileID: 589423227, guid: 71f1f377a8549484a93c553665cb7868, type: 3}
