@@ -32,22 +32,22 @@ public class DialogControl : MonoBehaviour
   {
     if (Input.GetKeyDown(KeyCode.E))
     {
-      if (DialogHandler.instance != null)
-        DialogHandler.instance.SetDialogIndex(index: 2);
+      if (interactionIcon.activeInHierarchy && !GetDialogBoxState())
+      {
+        if (NPCStats.instance != null)
+          NPCStats.instance.ActivateNPCDialog();
 
-      if (NPCStats.instance != null)
-        NPCStats.instance.ActivateNPCDialog();
+        Debug.Log("Dialog length = " + DialogHandler.instance.GetDialogLength());
+        Debug.Log("Gameobject with instance of DebugHandler: " + DialogHandler.instance.gameObject.name);
 
-
-      Debug.Log("Dialog length = " + DialogHandler.instance.GetDialogLength());
-      Debug.Log("Gameobject with instance of DebugHandler: " + DialogHandler.instance.gameObject.name);
+      }
     }
 
     if (Input.GetKeyDown(KeyCode.C))
     {
       if (GetDialogBoxState())
       {
-          DialogHandler.instance.RunDialog();
+        DialogHandler.instance.RunDialog();
       }
     }
   }

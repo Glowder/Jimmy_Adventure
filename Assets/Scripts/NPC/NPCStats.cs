@@ -50,6 +50,8 @@ public class NPCStats : MonoBehaviour
       "<< and the instance is on >>" + DialogHandler.instance.gameObject.name + "<<");
       instance = this;
       DialogControl.instance.SetPorttraitImageAndName(npcPortrait, npcName);
+      DialogHandler.instance.SetDialogIndex(index: 0, startDialogAtSetIndex: true, playerOrNPC: "NPC");
+      Debug.Log("NPC Stats: Dialog Index set to " + DialogHandler.instance.currentDialogIndex);
     }
   }
 
@@ -72,6 +74,7 @@ public class NPCStats : MonoBehaviour
 
   public void ActivateNPCDialog()
   {
+    DialogHandler.instance.RunDialog();
     DialogControl.instance.interactionIcon.SetActive(false);
     DialogControl.instance.dialogTextBox.SetActive(true);
     DialogControl.instance.nameTextBox.SetActive(true);
@@ -82,6 +85,8 @@ public class NPCStats : MonoBehaviour
 
   public void DeactivateNPCDialog()
   {
+    DialogHandler.instance.SetDialogIndex(index: 0, startDialogAtSetIndex: true, playerOrNPC: "NPC");
+    DialogHandler.instance.RunDialog();
     DialogControl.instance.dialogTextBox.SetActive(false);
     DialogControl.instance.nameTextBox.SetActive(false);
     DialogControl.instance.dialogWithNameBox.SetActive(false);

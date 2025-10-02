@@ -7,7 +7,6 @@ public class Player : MonoBehaviour
 {
 
   public static Player instance;
-  [SerializeField] string playerName;
   public string lastUsedPortalName;
   public bool horizontalMove, verticalMove;
   [SerializeField] private Rigidbody2D playerRigidBody;
@@ -17,8 +16,6 @@ public class Player : MonoBehaviour
   private Vector3 bottomLeft, topRight;
   public bool newMapLoaded = false;
   public bool loadingNewMap = false;
-
-  [SerializeField] public string[] dialog; // For testing purposes only, remove later.
 
   void Start()
   {
@@ -105,20 +102,8 @@ public class Player : MonoBehaviour
 
   }
 
-  public string GetPlayerName()
-  {
-    return playerName;
-  }
 
-  public Sprite GetPlayerPortrait()
-  {
-    return gameObject.GetComponent<SpriteRenderer>().sprite;
-  }
 
-  public int GetDialogLength()
-  {
-    return dialog.Length;
-  }
 
   // Checks if the dialog box is active and disables player movement and animation if ture.
   // If false the player movement and animation is enabled again.

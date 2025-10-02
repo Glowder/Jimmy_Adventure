@@ -184,14 +184,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 462524599901027710, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: m_SortingLayer
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 462524599901027710, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 1738260055
-      objectReference: {fileID: 0}
     - target: {fileID: 1209075829210200688, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 25.34
@@ -236,34 +228,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: currentMap
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
+    - target: {fileID: 6319534386395621612, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
       propertyPath: playerName
       value: Jimmy
       objectReference: {fileID: 0}
-    - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: dialog.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: 'dialog.Array.data[0]'
-      value: I have Kohle!
-      objectReference: {fileID: 0}
-    - target: {fileID: 6922537398793452382, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: 'dialog.Array.data[1]'
-      value: Give me Items!
-      objectReference: {fileID: 0}
-    - target: {fileID: 9117105740799469375, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: m_Radius
-      value: 0.47
-      objectReference: {fileID: 0}
-    - target: {fileID: 9117105740799469375, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
-      propertyPath: m_Offset.y
-      value: -0.65
-      objectReference: {fileID: 0}
+    - target: {fileID: 6319534386395621612, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
+      propertyPath: playerPortrait
+      value: 
+      objectReference: {fileID: 589423227, guid: 71f1f377a8549484a93c553665cb7868, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -525,7 +497,7 @@ PrefabInstance:
     - target: {fileID: 4846857044506185651, guid: 74b412718cc340043a5594882e0c6066, type: 3}
       propertyPath: npcPortrait
       value: 
-      objectReference: {fileID: 6586815544308170364, guid: f55f464c38190194a8469b9c50fd2c2e, type: 3}
+      objectReference: {fileID: -321394447, guid: f55f464c38190194a8469b9c50fd2c2e, type: 3}
     - target: {fileID: 8915080608252980181, guid: 74b412718cc340043a5594882e0c6066, type: 3}
       propertyPath: m_LocalPosition.x
       value: 25.881212
@@ -592,7 +564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
   dialog:
-  - '#NPC'
+  - Well, hello Geldbeu... I mean customer!
   - I have Items!
   - '#Player'
   - I Have Kohle
@@ -600,6 +572,7 @@ MonoBehaviour:
   - Give me Kohle!
   - '#Player'
   - Give me Item!
+  currentDialogIndex: 0
 --- !u!1001 &1491255945
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -623,7 +596,7 @@ PrefabInstance:
     - target: {fileID: 4846857044506185651, guid: 74b412718cc340043a5594882e0c6066, type: 3}
       propertyPath: npcPortrait
       value: 
-      objectReference: {fileID: 7326034899775742671, guid: 61514cd3b827b2c4aa76dd99ad480050, type: 3}
+      objectReference: {fileID: -2120243601, guid: 61514cd3b827b2c4aa76dd99ad480050, type: 3}
     - target: {fileID: 8915080608252980181, guid: 74b412718cc340043a5594882e0c6066, type: 3}
       propertyPath: m_LocalPosition.x
       value: 21.94577
@@ -690,13 +663,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
   dialog:
-  - '#NPC'
   - Hello horny boy!
   - Need food?
   - '#Player'
   - Hunger!
   - '#NPC'
   - Money!
+  currentDialogIndex: 0
 --- !u!4 &1770364178 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1209075829210200688, guid: 9db911faa7531ef439c6dd7a8956e6f7, type: 3}
@@ -8912,6 +8885,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Generic Character
       objectReference: {fileID: 0}
+    - target: {fileID: 4846857044506185651, guid: 74b412718cc340043a5594882e0c6066, type: 3}
+      propertyPath: npcPortrait
+      value: 
+      objectReference: {fileID: 1366952498, guid: ddf8f9d2822799d40a5edf9bf50b484c, type: 3}
     - target: {fileID: 8915080608252980181, guid: 74b412718cc340043a5594882e0c6066, type: 3}
       propertyPath: m_LocalPosition.x
       value: 25.46
@@ -8978,7 +8955,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogHandler
   dialog:
-  - '#NPC'
   - Generic greetings!
   - Generic question?
   - '#Player'
@@ -8987,6 +8963,7 @@ MonoBehaviour:
   - Generic praise
   - '#Player'
   - Cringe monolog...
+  currentDialogIndex: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

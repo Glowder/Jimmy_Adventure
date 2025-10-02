@@ -1,3 +1,5 @@
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class DialogHandler : MonoBehaviour
@@ -38,37 +40,58 @@ public class DialogHandler : MonoBehaviour
       NPCStats.instance.DeactivateNPCDialog();
     }
 
-    if (dialog[currentDialogIndex].StartsWith("#NPC"))
+    else if (currentDialogIndex < dialog.Length && dialog[currentDialogIndex].StartsWith("#NPC"))
     {
       currentDialogIndex++;
-      Debug.Log("Current Dialog Index: " + currentDialogIndex);
-      DialogControl.instance.SetPorttraitImageAndName(NPCStats.instance.GetNPCPortrait(), NPCStats.instance.GetNPCName());
-      DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+      Debug.Log("Current (NPC) Dialog Index: " + currentDialogIndex);
+      if (DialogControl.instance != null && NPCStats.instance != null)
+      {
+        DialogControl.instance.SetPorttraitImageAndName(NPCStats.instance.GetNPCPortrait(), NPCStats.instance.GetNPCName());
+        DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+        Debug.Log("Current (NPC) dialog text reached!");
+      }
       currentDialogIndex++;
-      Debug.Log("Current Dialog Index: " + currentDialogIndex);
+      Debug.Log("Current (2. NPC) Dialog Index: " + currentDialogIndex);
     }
 
-    else if (dialog[currentDialogIndex].StartsWith("#Player"))
+    else if (currentDialogIndex < dialog.Length && dialog[currentDialogIndex].StartsWith("#Player"))
     {
       currentDialogIndex++;
-      Debug.Log("Current Dialog Index: " + currentDialogIndex);
-      DialogControl.instance.SetPorttraitImageAndName(Player.instance.GetPlayerPortrait(), Player.instance.GetPlayerName());
-      DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+      Debug.Log("Current (Player) Dialog Index: " + currentDialogIndex);
+      if (DialogControl.instance != null && PlayerStats.instance != null)
+      {
+        DialogControl.instance.SetPorttraitImageAndName(PlayerStats.instance.GetPlayerPortrait(), PlayerStats.instance.GetPlayerName());
+        DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+        Debug.Log("Current (Player) dialog text reached!");
+      }
       currentDialogIndex++;
-      Debug.Log("Current Dialog Index: " + currentDialogIndex);
+      Debug.Log("Current (2. Player) Dialog Index: " + currentDialogIndex);
     }
 
     else
     {
-      DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
-      currentDialogIndex++;
+      if (currentDialogIndex < dialog.Length)
+      {
+        DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+        currentDialogIndex++;
+      }
       Debug.Log("Current Dialog Index: " + currentDialogIndex);
     }
 
   }
-  public void SetDialogIndex(int index)
+  public void SetDialogIndex(int index, bool startDialogAtSetIndex, string playerOrNPC)
   {
     currentDialogIndex = index;
 
+    if (startDialogAtSetIndex)
+      DialogControl.instance.dialogText.text = dialog[currentDialogIndex];
+
+    if (playerOrNPC == "NPC")
+      DialogControl.instance.SetPorttraitImageAndName(NPCStats.instance.GetNPCPortrait(), NPCStats.instance.GetNPCName());
+
+    else if (playerOrNPC == "Player")
+      DialogControl.instance.SetPorttraitImageAndName(PlayerStats.instance.GetPlayerPortrait(), PlayerStats.instance.GetPlayerName());
+    else
+      DialogControl.instance.SetPorttraitImageAndName(NPCStats.instance.GetNPCPortrait(), NPCStats.instance.GetNPCName());
   }
 }
