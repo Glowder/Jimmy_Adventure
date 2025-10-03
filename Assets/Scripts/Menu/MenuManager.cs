@@ -6,14 +6,16 @@ public class MenuManager : MonoBehaviour
   public static MenuManager instance;
   [SerializeField] Image image;
   [SerializeField] Animator animator;
+  [SerializeField] GameObject menuCanvas;
   // Start is called once before the first execution of Update after the MonoBehaviour is created
   void Start()
   {
+    CreateInstance();
+
     image.gameObject.SetActive(true);
     // image = GameObject.Find("Fading").GetComponent<Image>();
     image = GetComponentInChildren<Image>();
 
-    CreateInstance();
   }
 
   // Update is called once per frame
@@ -22,6 +24,15 @@ public class MenuManager : MonoBehaviour
     if (!image)
     {
       image = GetComponentInChildren<Image>();
+    }
+
+    if (Input.GetKeyDown(KeyCode.P))
+    {
+      if (!menuCanvas.activeInHierarchy)
+        menuCanvas.SetActive(true);
+      else
+        menuCanvas.SetActive(false);
+      
     }
   }
 
