@@ -32,7 +32,7 @@ public class DialogControl : MonoBehaviour
   {
     if (Input.GetKeyDown(KeyCode.E))
     {
-      if (interactionIcon.activeInHierarchy && !GetDialogBoxState())
+      if (interactionIcon.activeInHierarchy && !GetDialogBoxState() && !MenuManager.instance.GetMenuCanvasState())
       {
         if (NPCStats.instance != null)
           NPCStats.instance.ActivateNPCDialog();
@@ -54,7 +54,6 @@ public class DialogControl : MonoBehaviour
 
   public void SetPorttraitImageAndName(Sprite portrait, string name)
   {
-    // if (portraitImage != null)
     portraitImage.GetComponent<Image>().sprite = portrait;
     nameText.text = name;
   }

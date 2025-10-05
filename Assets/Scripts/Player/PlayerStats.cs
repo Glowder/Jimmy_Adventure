@@ -5,12 +5,12 @@ public class PlayerStats : MonoBehaviour
 {
   public static PlayerStats instance;
   [SerializeField] Sprite playerPortrait;
-  [SerializeField] string playerName;
+  [SerializeField] string playerName, playerClass;
   [SerializeField]
-  int maxLevel = 50, currentLevel = 1,
-  maxXP, currentXP,
-  maxHP = 100, currentHP, strength = 3,
-  maxMP = 80, currentMP, intelligence = 5,
+  int groupPositionNumber, maxLevel = 50, currentLevel = 5,
+  maxXP, currentXP = 25,
+  maxHP = 100, currentHP = 30, strength = 3,
+  maxMP = 80, currentMP = 20, intelligence = 5,
   dexterity = 2,
   physicalDEF = 2, magicalDEF = 4;
 
@@ -21,6 +21,7 @@ public class PlayerStats : MonoBehaviour
   {
     CreateInstance();
     SetRequieredXPForEachLevel();
+    // maxXP = requiredXPForEachLevel[currentLevel - 1];
   }
 
   // Update is called once per frame
@@ -37,15 +38,6 @@ public class PlayerStats : MonoBehaviour
     Debug.Log("Player instance created from PlayerStats.");
   }
 
-  public string GetPlayerName()
-  {
-    return playerName;
-  }
-
-  public Sprite GetPlayerPortrait()
-  {
-    return playerPortrait;
-  }
 
   private void SetRequieredXPForEachLevel()
   {
@@ -55,7 +47,6 @@ public class PlayerStats : MonoBehaviour
 
     for (int i = 0; i < maxLevel; i++)
     {
-      // int xp = (int)(i + Mathf.Sqrt(i) * 17);
       // int xp = (int)(Mathf.Pow(i, 2) * 15);   // z.B. quadratisch
       // int xp = i * 100;                       // lineare Kurve
       int xp = (int)(Mathf.Pow(1.15f, i) * 36); // exponentiell wachsend
@@ -101,4 +92,83 @@ public class PlayerStats : MonoBehaviour
 
     magicalDEF = Mathf.FloorToInt(intelligence * 1.35f);
   }
+
+  #region Getters
+  public string GetPlayerName()
+  {
+    return playerName;
+  }
+
+  public Sprite GetPlayerPortrait()
+  {
+    return playerPortrait;
+  }
+
+  public int GetHealth()
+  {
+    return currentHP;
+  }
+
+  public int GetMana()
+  {
+    return currentMP;
+  }
+
+  public int GetExperience()
+  {
+    return currentXP;
+  }
+
+  public int GetLevel()
+  {
+    return currentLevel;
+  }
+
+  public int GetDexterity()
+  {
+    return dexterity;
+  }
+  public int GetGroupPositionNumber()
+  {
+    return groupPositionNumber;
+  }
+  public string GetPlayerClass()
+  {
+    return playerClass;
+  }
+  public int GetMaxHealth()
+  {
+    return maxHP;
+  }
+  public int GetMaxMana()
+  {
+    return maxMP;
+  }
+  public int GetStrength()
+  {
+    return strength;
+  }
+  public int GetIntelligence()
+  {
+    return intelligence;
+  }
+  public int GetPhysicalDEF()
+  {
+    return physicalDEF;
+  }
+  public int GetMagicalDEF()
+  {
+    return magicalDEF;
+  }
+  public int GetMaxLevel()
+  {
+    return maxLevel;
+  }
+  public int GetMaxXP()
+  {
+    maxXP = requiredXPForEachLevel[currentLevel - 1];
+    return maxXP;
+  }
+  #endregion
+
 }

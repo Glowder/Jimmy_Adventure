@@ -3,7 +3,22 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Character Slot
+  - pDEF
+  - mDEF
+  - Strength
+  - Dexterity
+  - Intelligence
+  - Character Portraits
+  - Character Names
+  - Character Level
+  - Character Health
+  - Character Mana
+  - Character Experience
+  - HP Slider
+  - MP Slider
+  - EXP Slider
   layers:
   - Default
   - TransparentFX

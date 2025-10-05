@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
   void Start()
   {
     CreateInstanceAndKeepAlive();
-    playerStats = FindObjectsByType<PlayerStats>(FindObjectsSortMode.InstanceID);
+    playerStats = FindObjectsByType<PlayerStats>(FindObjectsSortMode.None);
   }
 
   // Update is called once per frame
@@ -27,5 +27,10 @@ public class GameManager : MonoBehaviour
       instance = this;
 
     DontDestroyOnLoad(this.gameObject);
+  }
+
+  public PlayerStats[] GetPlayerStats()
+  {
+    return playerStats;
   }
 }

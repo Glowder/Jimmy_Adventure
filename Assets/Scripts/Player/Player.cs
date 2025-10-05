@@ -37,8 +37,6 @@ public class Player : MonoBehaviour
   // Handles the player movement and animations.
   private void PlayerMovement()
   {
-    DeactivateMovementAndAnimation();
-
     // Gets the player input from the Input Manager.
     float horizontalMovement = Input.GetAxis("Horizontal");
     float verticalMovement = Input.GetAxis("Vertical");
@@ -107,18 +105,20 @@ public class Player : MonoBehaviour
 
   // Checks if the dialog box is active and disables player movement and animation if ture.
   // If false the player movement and animation is enabled again.
-  private void DeactivateMovementAndAnimation()
+  public void DeactivateMovementAndAnimation(bool deactivate)
   {
-    if (DialogControl.instance.dialogBox.activeInHierarchy || DialogControl.instance.dialogWithNameBox.activeInHierarchy)
+    if (deactivate)
     {
       playerAnimator.enabled = false;
       playerRigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
+      Debug.Log("Player movement deactivated from Player script");
     }
     else
     {
       playerAnimator.enabled = true;
       playerRigidBody.constraints = RigidbodyConstraints2D.None;
       playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+      Debug.Log("Player movement activated from Player script");
     }
   }
 }

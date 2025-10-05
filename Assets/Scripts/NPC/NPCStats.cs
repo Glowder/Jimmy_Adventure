@@ -44,29 +44,26 @@ public class NPCStats : MonoBehaviour
     if (collision.CompareTag("Player"))
     {
       gameObject.GetComponent<DialogHandler>().enabled = true;
+
       DialogControl.instance.interactionIcon.SetActive(true);
+
       gameObject.GetComponent<DialogHandler>().CreateInstance();
-      Debug.Log("DialogHandler Instance Created from NPCStats of >>" + gameObject.name +
-      "<< and the instance is on >>" + DialogHandler.instance.gameObject.name + "<<");
+
       instance = this;
+
       DialogControl.instance.SetPorttraitImageAndName(npcPortrait, npcName);
       DialogHandler.instance.SetDialogIndex(index: 0, startDialogAtSetIndex: true, playerOrNPC: "NPC");
-      Debug.Log("NPC Stats: Dialog Index set to " + DialogHandler.instance.currentDialogIndex);
     }
   }
-
-  // private void OggerStay2D(Collider2D collision)
-  // {
-  //   if (collision.CompareTag("Player") && !DialogControl.instance.GetDialogBoxState())
-  //       DialogControl.instance.interactionIcon.SetActive(true);  
-  // }
 
   private void OnTriggerExit2D(Collider2D collision)
   {
     if (collision.CompareTag("Player"))
     {
       gameObject.GetComponent<DialogHandler>().enabled = false;
+      
       DeactivateNPCDialog();
+
       if (DialogControl.instance.interactionIcon.activeInHierarchy)
         DialogControl.instance.interactionIcon.SetActive(false);
     }
@@ -81,6 +78,7 @@ public class NPCStats : MonoBehaviour
     DialogControl.instance.dialogWithNameBox.SetActive(true);
     DialogControl.instance.portraitBox.SetActive(true);
     DialogControl.instance.portraitImage.SetActive(true);
+    Player.instance.DeactivateMovementAndAnimation(deactivate: true);
   }
 
   public void DeactivateNPCDialog()
@@ -94,6 +92,7 @@ public class NPCStats : MonoBehaviour
     DialogControl.instance.portraitImage.SetActive(false);
     if (!DialogControl.instance.GetDialogBoxState())
       DialogControl.instance.interactionIcon.SetActive(true);
+    Player.instance.DeactivateMovementAndAnimation(deactivate: false);
   }
 
   public string GetNPCName()
