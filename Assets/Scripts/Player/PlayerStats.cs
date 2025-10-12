@@ -7,12 +7,12 @@ public class PlayerStats : MonoBehaviour
   [SerializeField] Sprite playerPortrait;
   [SerializeField] string playerName, playerClass;
   [SerializeField]
-  int groupPositionNumber, maxLevel = 50, currentLevel = 5,
-  maxXP, currentXP = 25,
-  maxHP = 100, currentHP = 30, strength = 3,
-  maxMP = 80, currentMP = 20, intelligence = 5,
-  dexterity = 2,
-  physicalDEF = 2, magicalDEF = 4;
+  int groupPositionNumber, maxLevel, currentLevel = 1,
+  maxXP, currentXP,
+  maxHP, currentHP, strength,
+  maxMP, currentMP, intelligence,
+  dexterity, crit,
+  physicalDEF, physicalEvasion, magicDEF, magicEvasion;
 
   public List<int> requiredXPForEachLevel = new List<int>();
 
@@ -74,6 +74,29 @@ public class PlayerStats : MonoBehaviour
         currentXP = 0;
 
     }
+
+  }
+
+  public void SetDSValues()
+  {
+    MenuManager.instance.DSNameText.text = playerName;
+    MenuManager.instance.DSPortrait.sprite = playerPortrait;
+    MenuManager.instance.DSHealthText.text = currentHP + " / " + maxHP;
+    MenuManager.instance.DSHealthSlider.maxValue = maxHP;
+    MenuManager.instance.DSHealthSlider.value = currentHP;
+    MenuManager.instance.DSManaText.text = currentMP + " / " + maxMP;
+    MenuManager.instance.DSManaSlider.maxValue = maxMP;
+    MenuManager.instance.DSManaSlider.value = currentMP;
+    MenuManager.instance.DSExpText.text = currentXP + " / " + maxXP;
+    MenuManager.instance.DSLevelText.text = "Level: " + currentLevel;
+    MenuManager.instance.DSStrengthText.text = "Strength: " + strength;
+    MenuManager.instance.DSIntelligenceText.text = "Intelligence: " + intelligence;
+    MenuManager.instance.DSCritText.text = "Critical: " + crit + "%";
+    MenuManager.instance.DSDexterityText.text = "Dexterity: " + dexterity;
+    MenuManager.instance.DSPhysicalDEFText.text = "Physical DEF: " + physicalDEF;
+    MenuManager.instance.DSMagicDEFText.text = "Magical DEF: " + magicDEF;
+    MenuManager.instance.DSPhysicalEvasion.text = "Physical Evasion: " + physicalEvasion + "%";
+    MenuManager.instance.DSMagicEvasion.text = "Magical Evasion: " + magicEvasion + "%";
   }
 
   public void AddStatsAfterLevelUp()
@@ -90,10 +113,15 @@ public class PlayerStats : MonoBehaviour
 
     physicalDEF = Mathf.FloorToInt(strength * 1.23f);
 
-    magicalDEF = Mathf.FloorToInt(intelligence * 1.35f);
+    magicDEF = Mathf.FloorToInt(intelligence * 1.35f);
   }
 
+
   #region Getters
+  public int GetCritChance()
+  {
+    return crit;
+  }
   public string GetPlayerName()
   {
     return playerName;
@@ -158,7 +186,7 @@ public class PlayerStats : MonoBehaviour
   }
   public int GetMagicalDEF()
   {
-    return magicalDEF;
+    return magicDEF;
   }
   public int GetMaxLevel()
   {
@@ -166,8 +194,21 @@ public class PlayerStats : MonoBehaviour
   }
   public int GetMaxXP()
   {
-    maxXP = requiredXPForEachLevel[currentLevel - 1];
+    if (currentLevel < 1)
+      currentLevel = 1;
+
+    maxXP = requiredXPForEachLevel[currentLevel];
     return maxXP;
+  }
+
+  public int GetPhysicalEvasion()
+  {
+    return physicalEvasion;
+  }
+
+  public int GetMagicalEvasion()
+  {
+    return magicEvasion;
   }
   #endregion
 

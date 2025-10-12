@@ -19,6 +19,29 @@ TagManager:
   - HP Slider
   - MP Slider
   - EXP Slider
+  - CharStatSprite
+  - CharStatName
+  - CharStatLvl
+  - CharStatHP
+  - CharStatHPSlider
+  - CharStatMP
+  - CharStatMPSlider
+  - CharStatEXP
+  - CharStatEXPSlider
+  - CharStatStr
+  - CharStatInt
+  - CharStatCrit
+  - CharStatDex
+  - CharStatpDEF
+  - CharStatmDEF
+  - CharStatpEvasion
+  - CharStatmEvasion
+  - CharStatLH
+  - CharStatHead
+  - CharStatRH
+  - CharStatArms
+  - CharStatTorso
+  - CharStatLegs
   layers:
   - Default
   - TransparentFX
