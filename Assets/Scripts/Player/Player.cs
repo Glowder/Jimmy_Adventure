@@ -111,14 +111,14 @@ public class Player : MonoBehaviour
     {
       playerAnimator.enabled = false;
       playerRigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
-      Debug.Log("Player movement deactivated from Player script");
+      // Debug.Log("Player movement deactivated from Player script");
     }
     else
     {
       playerAnimator.enabled = true;
       playerRigidBody.constraints = RigidbodyConstraints2D.None;
       playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
-      Debug.Log("Player movement activated from Player script");
+      // Debug.Log("Player movement activated from Player script");
     }
   }
 }

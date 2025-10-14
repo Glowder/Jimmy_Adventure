@@ -35,7 +35,7 @@ public class PlayerStats : MonoBehaviour
     if (instance == null || instance != this)
       instance = this;
 
-    Debug.Log("Player instance created from PlayerStats.");
+    // Debug.Log("Player instance created from PlayerStats.");
   }
 
 
@@ -57,27 +57,38 @@ public class PlayerStats : MonoBehaviour
 
   private void PlayerLevelingManagement()
   {
+    // Safety check for the list
+    if (requiredXPForEachLevel == null || requiredXPForEachLevel.Count == 0)
+      return;
+
     if (currentLevel < maxLevel)
     {
       if (Input.GetKeyDown(KeyCode.L))
         currentXP += currentLevel * 100;
 
-      if (currentXP >= requiredXPForEachLevel[currentLevel - 1])
+      // Ensure currentLevel - 1 is within bounds
+      int levelIndex = Mathf.Min(currentLevel - 1, requiredXPForEachLevel.Count - 1);
+      levelIndex = Mathf.Max(0, levelIndex);
+
+      if (currentXP >= requiredXPForEachLevel[levelIndex])
       {
-        currentXP -= requiredXPForEachLevel[currentLevel - 1];
+        currentXP -= requiredXPForEachLevel[levelIndex];
         currentLevel++;
-        Debug.Log($"Player leveled up! New Level: {currentLevel}");
-        Debug.Log($"Reqired XP for next level: {requiredXPForEachLevel[currentLevel - 1]}");
+        // Debug.Log($"Player leveled up! New Level: {currentLevel}");
+        
+        // Safe access for next level XP display
+        if (currentLevel - 1 < requiredXPForEachLevel.Count)
+        {
+          // Debug.Log($"Required XP for next level: {requiredXPForEachLevel[currentLevel - 1]}");
+        }
         AddStatsAfterLevelUp();
       }
       if (currentLevel == maxLevel)
         currentXP = 0;
-
     }
-
   }
 
-  public void SetDSValues()
+  public void SetDetailedStatsValues()
   {
     MenuManager.instance.DSNameText.text = playerName;
     MenuManager.instance.DSPortrait.sprite = playerPortrait;
@@ -194,10 +205,21 @@ public class PlayerStats : MonoBehaviour
   }
   public int GetMaxXP()
   {
+    // Safety checks
     if (currentLevel < 1)
       currentLevel = 1;
+    
+    if (requiredXPForEachLevel == null || requiredXPForEachLevel.Count == 0)
+    {
+      Debug.LogWarning("requiredXPForEachLevel list is empty or null!");
+      return maxXP = 100; // Return a default value
+    }
 
-    maxXP = requiredXPForEachLevel[currentLevel];
+    // Ensure we don't go out of bounds and use 0-based indexing
+    int levelIndex = Mathf.Min(currentLevel - 1, requiredXPForEachLevel.Count - 1);
+    levelIndex = Mathf.Max(0, levelIndex); // Ensure index is never negative
+    
+    maxXP = requiredXPForEachLevel[levelIndex];
     return maxXP;
   }
 

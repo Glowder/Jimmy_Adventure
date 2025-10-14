@@ -66,7 +66,6 @@ public class MenuManager : MonoBehaviour
   {
     // button.onClick.AddListener(UpdateStats);
 
-    SetPlayerStatsArrayElementsInCanvas();
     if (Input.GetKeyDown(KeyCode.U))
     {
       // UpdateStats();
@@ -76,6 +75,12 @@ public class MenuManager : MonoBehaviour
     {
       if (GameManager.instance != null)
         playerStats = GameManager.instance.GetPlayerStats();
+    }
+
+    // Only update UI elements if we have valid player stats
+    if (playerStats != null && playerStats.Length > 0)
+    {
+      SetPlayerStatsArrayElementsInCanvas();
     }
 
     if (image == null)
@@ -88,60 +93,70 @@ public class MenuManager : MonoBehaviour
 
   public void UpdateStats()
   {
-
     if (playerStats == null || playerStats.Length == 0)
     {
       if (GameManager.instance != null)
         playerStats = GameManager.instance.GetPlayerStats();
     }
 
+    // The SetPlayerStatsArrayElementsInCanvas() method now handles positioning based on groupPositionNumber
     SetPlayerStatsArrayElementsInCanvas();
-
-    foreach (GameObject slot in characterSlots)
-      slot.SetActive(false);
-
-    for (int i = 0; i < playerStats.Length - 1; i++)
-    {
-      nameText[i].text = playerStats[i].GetPlayerName();
-      healthText[i].text = playerStats[i].GetHealth().ToString() + " / " + playerStats[i].GetMaxHealth().ToString();
-      healthSlider[i].maxValue = playerStats[i].GetMaxHealth();
-      healthSlider[i].value = playerStats[i].GetHealth();
-      manaText[i].text = playerStats[i].GetMana().ToString() + " / " + playerStats[i].GetMaxMana().ToString();
-      manaSlider[i].maxValue = playerStats[i].GetMaxMana();
-      manaSlider[i].value = playerStats[i].GetMana();
-      expText[i].text = playerStats[i].GetExperience().ToString() + " / " + playerStats[i].GetMaxXP().ToString();
-      expSlider[i].maxValue = playerStats[i].GetMaxXP();
-      expSlider[i].value = playerStats[i].GetExperience();
-      levelText[i].text = "Level: " + playerStats[i].GetLevel().ToString();
-      characterImages[i].sprite = playerStats[i].GetPlayerPortrait();
-    }
   }
 
   // Find and set all the UI elements in the menu canvas to their respective lists
   private void SetPlayerStatsArrayElementsInCanvas()
   {
+    // Safety check
+    if (playerStats == null || playerStats.Length == 0)
+      return;
+
+    // First, deactivate all slots
+    for (int i = 0; i < characterSlots.Length; i++)
+    {
+      if (characterSlots[i] != null)
+        characterSlots[i].SetActive(false);
+    }
+
+    // Then activate and populate slots based on groupPositionNumber
     for (int i = 0; i < playerStats.Length; i++)
     {
-      if (i >= playerStats.Length)
+      if (playerStats[i] != null)
       {
-        characterSlots[i].SetActive(false);
-
-      }
-      else
-      {
-        characterSlots[i].SetActive(true);
-        nameText[i].text = playerStats[i].GetPlayerName();
-        healthText[i].text = playerStats[i].GetHealth().ToString() + " / " + playerStats[i].GetMaxHealth().ToString();
-        healthSlider[i].maxValue = playerStats[i].GetMaxHealth();
-        healthSlider[i].value = playerStats[i].GetHealth();
-        manaText[i].text = playerStats[i].GetMana().ToString() + " / " + playerStats[i].GetMaxMana().ToString();
-        manaSlider[i].maxValue = playerStats[i].GetMaxMana();
-        manaSlider[i].value = playerStats[i].GetMana();
-        // expText[i].text = playerStats[i].GetExperience().ToString() + " / " + playerStats[i].GetMaxXP().ToString();
-        expSlider[i].maxValue = playerStats[i].GetMaxXP();
-        expSlider[i].value = playerStats[i].GetExperience();
-        levelText[i].text = "Level: " + playerStats[i].GetLevel().ToString();
-        characterImages[i].sprite = playerStats[i].GetPlayerPortrait();
+        // Get the group position (0-based for direct array indexing)
+        int slotIndex = playerStats[i].GetGroupPositionNumber();
+        
+        // Make sure the slot index is valid
+        if (slotIndex >= 0 && slotIndex < characterSlots.Length && characterSlots[slotIndex] != null)
+        {
+          characterSlots[slotIndex].SetActive(true);
+          
+          // Safe null checks for UI elements at the specific slot position
+          if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].GetPlayerName();
+          if (healthText[slotIndex] != null) healthText[slotIndex].text = playerStats[i].GetHealth().ToString() + " / " + playerStats[i].GetMaxHealth().ToString();
+          if (healthSlider[slotIndex] != null)
+          {
+            healthSlider[slotIndex].maxValue = playerStats[i].GetMaxHealth();
+            healthSlider[slotIndex].value = playerStats[i].GetHealth();
+          }
+          if (manaText[slotIndex] != null) manaText[slotIndex].text = playerStats[i].GetMana().ToString() + " / " + playerStats[i].GetMaxMana().ToString();
+          if (manaSlider[slotIndex] != null)
+          {
+            manaSlider[slotIndex].maxValue = playerStats[i].GetMaxMana();
+            manaSlider[slotIndex].value = playerStats[i].GetMana();
+          }
+          if (expText[slotIndex] != null) expText[slotIndex].text = playerStats[i].GetExperience().ToString() + " / " + playerStats[i].GetMaxXP().ToString();
+          if (expSlider[slotIndex] != null)
+          {
+            expSlider[slotIndex].maxValue = playerStats[i].GetMaxXP();
+            expSlider[slotIndex].value = playerStats[i].GetExperience();
+          }
+          if (levelText[slotIndex] != null) levelText[slotIndex].text = "Level: " + playerStats[i].GetLevel().ToString();
+          if (characterImages[slotIndex] != null) characterImages[slotIndex].sprite = playerStats[i].GetPlayerPortrait();
+        }
+        else
+        {
+          Debug.LogWarning($"Player {playerStats[i].GetPlayerName()} has invalid groupPositionNumber: {playerStats[i].GetGroupPositionNumber()}");
+        }
       }
     }
   }
@@ -160,7 +175,7 @@ public class MenuManager : MonoBehaviour
         if (Player.instance != null)
         {
           Player.instance.DeactivateMovementAndAnimation(deactivate: true);
-          Debug.Log("Menu open and player movement deactivated.");
+          // Debug.Log("Menu open and player movement deactivated.");
         }
       }
       else if (menuCanvas.activeInHierarchy && !DialogControl.instance.GetDialogBoxState())
@@ -169,7 +184,7 @@ public class MenuManager : MonoBehaviour
         if (Player.instance != null)
         {
           Player.instance.DeactivateMovementAndAnimation(deactivate: false);
-          Debug.Log("Menu closed and player movement activated.");
+          // Debug.Log("Menu closed and player movement activated.");
         }
       }
 
@@ -201,6 +216,7 @@ public class MenuManager : MonoBehaviour
 
   #region Getter and Setter
 
+  // DS = Detailed Stats
   public UnityEngine.UI.Image DSPortrait
   {
     get => dSPortrait;

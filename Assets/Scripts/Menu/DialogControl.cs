@@ -6,7 +6,8 @@ using Unity.VisualScripting;
 public class DialogControl : MonoBehaviour
 {
   public static DialogControl instance;
-  [SerializeField] public TextMeshProUGUI dialogText, nameText;
+  [SerializeField] GameObject testPortrait;
+  [SerializeField] public TextMeshProUGUI testText, dialogText, nameText;
 
   #region Dialog UI GameObjects
   [SerializeField]
@@ -37,15 +38,15 @@ public class DialogControl : MonoBehaviour
         if (NPCStats.instance != null)
           NPCStats.instance.ActivateNPCDialog();
 
-        Debug.Log("Dialog length = " + DialogHandler.instance.GetDialogLength());
-        Debug.Log("Gameobject with instance of DebugHandler: " + DialogHandler.instance.gameObject.name);
+        // Debug.Log("Dialog length = " + DialogHandler.instance.GetDialogLength());
+        // Debug.Log("Gameobject with instance of DebugHandler: " + DialogHandler.instance.gameObject.name);
 
       }
     }
 
     if (Input.GetKeyDown(KeyCode.C))
     {
-      if (GetDialogBoxState())
+      if (GetDialogBoxState() && DialogHandler.instance != null)
       {
         DialogHandler.instance.RunDialog();
       }
@@ -56,6 +57,11 @@ public class DialogControl : MonoBehaviour
   {
     portraitImage.GetComponent<Image>().sprite = portrait;
     nameText.text = name;
+  }
+  public void SetTestImageAndName(Sprite portrait, string name)
+  {
+    testPortrait.GetComponent<Image>().sprite = portrait;
+    testText.text = name;
   }
 
   public void CreateInstance()
