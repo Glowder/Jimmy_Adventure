@@ -2,6 +2,39 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviour
 {
+    public enum ItemForQuest { QuestItem, NotForQuest }
+    public ItemForQuest itemForQuest;
+    public enum ItemType
+    {
+        Consumable,
+        Equipment,
+        Miscellaneous,
+        CraftingMaterial
+
+    }
+
+    public ItemType itemType;
+    public enum ItemAffinity { Magical, Physical, None }
+    public ItemAffinity itemAffinity;
+
+    public enum ItemMaterial { Metal, Leather, Cloth, None }
+    public ItemMaterial itemMaterial;
+    public string itemName, itemDescription;
+    public Sprite itemIcon;
+    public int itemID, itemValue, maxStackSize, currentStackSize;
+    public bool isStackable;
+
+    public enum ItemEffect
+    {
+        ExperienceAffector,
+        HealthAffector,
+        ManaAffector,
+        StrengthAffector,
+        None
+    }
+    public ItemEffect itemEffect;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
