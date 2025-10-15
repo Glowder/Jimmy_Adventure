@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour
 {
   public static MenuManager instance;
 
-  [SerializeField] UnityEngine.UI.Button button;
+  [SerializeField] UnityEngine.UI.Button[] itemButtons = new UnityEngine.UI.Button[27];
   [SerializeField] UnityEngine.UI.Image image;
   [SerializeField] Animator animator;
   [SerializeField] GameObject menuCanvas;
@@ -51,24 +51,15 @@ public class MenuManager : MonoBehaviour
 
     image.enabled = true;
     image = GetComponentInChildren<UnityEngine.UI.Image>();
-
-    // for (int i = 0; i < nameText.Length; i++)
-    // {
-    //   GameObject placeholder = new GameObject("Name Text placeholder " + i);
-    //   placeholder.transform.SetParent(this.transform);
-    //   nameText[i] = placeholder.AddComponent<TextMeshProUGUI>();
-    //   nameText[i].text = "Dis Name is " + i;
-    // }
   }
 
   // Update is called once per frame
   void Update()
   {
-    // button.onClick.AddListener(UpdateStats);
 
     if (Input.GetKeyDown(KeyCode.U))
     {
-      // UpdateStats();
+
     }
 
     if (playerStats == null || playerStats.Length == 0)
@@ -124,12 +115,12 @@ public class MenuManager : MonoBehaviour
       {
         // Get the group position (0-based for direct array indexing)
         int slotIndex = playerStats[i].GetGroupPositionNumber();
-        
+
         // Make sure the slot index is valid
         if (slotIndex >= 0 && slotIndex < characterSlots.Length && characterSlots[slotIndex] != null)
         {
           characterSlots[slotIndex].SetActive(true);
-          
+
           // Safe null checks for UI elements at the specific slot position
           if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].GetPlayerName();
           if (healthText[slotIndex] != null) healthText[slotIndex].text = playerStats[i].GetHealth().ToString() + " / " + playerStats[i].GetMaxHealth().ToString();
@@ -157,6 +148,23 @@ public class MenuManager : MonoBehaviour
         {
           Debug.LogWarning($"Player {playerStats[i].GetPlayerName()} has invalid groupPositionNumber: {playerStats[i].GetGroupPositionNumber()}");
         }
+      }
+    }
+  }
+
+  public void UpdateInventoryUI(int slotIndex)
+  {
+    if (Inventory.instance.GetItemDetails(slotIndex) != null && itemButtons[slotIndex] != null)
+    {
+      itemButtons[slotIndex].image.sprite = Inventory.instance.GetItemDetails(slotIndex).itemIcon;
+      if (ItemManager.instance != null && ItemManager.instance.GetIsStackable)
+      {
+        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = Inventory.instance.GetItemDetails(slotIndex).GetCurrentStackSize.ToString();
+      }
+      else
+      {
+        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = "1";
+        // itemButtons[slotIndex].image.sprite = Inventory.instance.GetItemDetails(slotIndex).itemIcon;
       }
     }
   }

@@ -100,9 +100,6 @@ public class Player : MonoBehaviour
 
   }
 
-
-
-
   // Checks if the dialog box is active and disables player movement and animation if ture.
   // If false the player movement and animation is enabled again.
   public void DeactivateMovementAndAnimation(bool deactivate)
