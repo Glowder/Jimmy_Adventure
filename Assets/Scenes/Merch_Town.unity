@@ -6187,7 +6187,7 @@ Transform:
   m_GameObject: {fileID: 372460777}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.168856, y: -0.040075302, z: 0}
+  m_LocalPosition: {x: 2.1688557, y: -1.0400753, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6216,7 +6216,7 @@ MonoBehaviour:
   itemValue: 67
   maxStackSize: 1
   currentStackSize: 0
-  isStackable: 0
+  isStackable: 1
   itemEffect: 0
 --- !u!212 &372460780
 SpriteRenderer:
@@ -10755,7 +10755,7 @@ Transform:
   m_GameObject: {fileID: 628371760}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.7609215, y: 0.22143936, z: 0}
+  m_LocalPosition: {x: -1.7609215, y: -0.77856064, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13343,7 +13343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.6156863}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
@@ -13790,7 +13790,7 @@ Transform:
   m_GameObject: {fileID: 778316696}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.447115, y: 5.787319, z: 0}
+  m_LocalPosition: {x: 0.44711494, y: 0.7873192, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13819,7 +13819,7 @@ MonoBehaviour:
   itemValue: 0
   maxStackSize: 0
   currentStackSize: 0
-  isStackable: 0
+  isStackable: 1
   itemEffect: 0
 --- !u!212 &778316699
 SpriteRenderer:
@@ -25186,7 +25186,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1494708376
 RectTransform:
   m_ObjectHideFlags: 0

@@ -56,13 +56,19 @@ public class ItemManager : MonoBehaviour
             if (Inventory.instance != null)
             {
                 Inventory.instance.AddItem(this);
-                Destroy(gameObject);
+                DestroyItem();
             }
             else
             {
-                Debug.Log($"You picked up {itemName}!");
+                Debug.Log($"You picked up Inventory.instance is = null!");
             }
         }
+    }
+
+    private void DestroyItem()
+    {
+        if (!isStackable)
+            Destroy(gameObject);
     }
 
 
@@ -75,7 +81,7 @@ public class ItemManager : MonoBehaviour
         get => maxStackSize;
     }
 
-    public int GetCurrentStackSize
+    public int CurrentStackSize
     {
         get => currentStackSize;
         set => currentStackSize = value;

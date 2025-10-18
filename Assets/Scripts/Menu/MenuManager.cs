@@ -154,12 +154,12 @@ public class MenuManager : MonoBehaviour
 
   public void UpdateInventoryUI(int slotIndex)
   {
-    if (Inventory.instance.GetItemDetails(slotIndex) != null && itemButtons[slotIndex] != null)
+    if (Inventory.instance.GetItemDetails(slotIndex) != null)
     {
       itemButtons[slotIndex].image.sprite = Inventory.instance.GetItemDetails(slotIndex).itemIcon;
       if (ItemManager.instance != null && ItemManager.instance.GetIsStackable)
       {
-        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = Inventory.instance.GetItemDetails(slotIndex).GetCurrentStackSize.ToString();
+        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = Inventory.instance.GetItemDetails(slotIndex).CurrentStackSize.ToString();
       }
       else
       {
@@ -195,8 +195,6 @@ public class MenuManager : MonoBehaviour
           // Debug.Log("Menu closed and player movement activated.");
         }
       }
-
-      // UpdateStats();
     }
   }
 
@@ -326,6 +324,8 @@ public class MenuManager : MonoBehaviour
     get => dSMagicEvasion;
     set => dSMagicEvasion = value;
   }
+
+  public int GetItemButtonCount => itemButtons.Length;
 
   #endregion
 }
