@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviour
 {
-    public static ItemManager instance;
     public enum ItemForQuest { QuestItem, NotForQuest }
     public ItemForQuest itemForQuest;
     public enum ItemType
@@ -21,6 +20,8 @@ public class ItemManager : MonoBehaviour
     public enum ItemMaterial { Metal, Leather, Cloth, None }
     public ItemMaterial itemMaterial;
     public string itemName, itemDescription;
+    public int itemLevelRequirement, itemHPBoost, itemMPBoost, itemStrengthBoost,
+    itemIntelligenceBoost, itemCritBoost, itemPhysicalDEFBoost, itemMagicDEFBoost;
     public Sprite itemIcon;
     public int itemID, itemValue, maxStackSize, currentStackSize;
     public bool isStackable;
@@ -39,7 +40,7 @@ public class ItemManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
@@ -67,8 +68,9 @@ public class ItemManager : MonoBehaviour
 
     private void DestroyItem()
     {
-        if (!isStackable)
-            Destroy(gameObject);
+        if (Inventory.instance.GetInventoryItemCount == MenuManager.instance.AvailableInventorySlots)
+        return;
+        Destroy(gameObject);
     }
 
 

@@ -42,6 +42,7 @@ TagManager:
   - CharStatArms
   - CharStatTorso
   - CharStatLegs
+  - ItemButton
   layers:
   - Default
   - TransparentFX

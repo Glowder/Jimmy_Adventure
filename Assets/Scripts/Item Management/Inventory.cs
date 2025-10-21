@@ -10,7 +10,12 @@ public class Inventory : MonoBehaviour
     public enum InventoryType { PlayerInventory, ChestInventory, ShopInventory }
     public InventoryType inventoryType;
 
-    public bool[] isInvSlotFree = new bool[27];
+    [SerializeField]
+    TMPro.TextMeshProUGUI itemDetailsStackSize, itemDetailsName, itemDetailsDescription,
+    itemDetailHP, itemDetailMP, itemDetailStrength, itemDetailIntelligence,
+    itemDetailSpecialAttribute, itemDetailCrit, itemDetailPhysicalDEF, itemDetailMagicDEF;
+
+    private bool stackableCheckedAndAdded = true;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -47,27 +52,103 @@ public class Inventory : MonoBehaviour
 
     public void AddItem(ItemManager item)
     {
-        for (int i = 0; i < MenuManager.instance.GetItemButtonCount; i++)
+        Debug.Log($"===>>> Stack check, at AddItem: {stackableCheckedAndAdded} <<<===");
+        if (items.Count == MenuManager.instance.AvailableInventorySlots)
         {
-            if (items[i] == null)
+            Debug.Log("Inventory is full!");
+            return;
+        }
+
+        if (item.isStackable)
+        {
+            AddStackableItem(item);
+
+            if (!stackableCheckedAndAdded)
             {
-                item.CurrentStackSize = 1;
-                items[i] = item;
-                MenuManager.instance.UpdateInventoryUI(i);
-                //TEMP: this line is just temporary for testing
-                // Debug.Log($"Added {item.itemName} to Inventory. Inventory now has {GetItemCount()} items.");
-                return;  // Exit method after successfully adding item
-            }
-            else if (items[i] == item && item.GetIsStackable && item.CurrentStackSize < item.GetMaxStackSize)
-            {
-                item.CurrentStackSize++;
-                //TEMP: this line is just temporary for testing
-                // Debug.Log($"Increased stack size of {item.itemName} to {item.GetCurrentStackSize}");
-                MenuManager.instance.UpdateInventoryUI(i);  // Also update UI for stack increase
-                return;  // Exit method after successfully stacking item
+                AddItemToNewSlot(item, item.CurrentStackSize);
             }
         }
-        Debug.Log("Inventory is full!");
+        else
+        {
+            // Non-stackable items go directly to new slot
+            AddItemToNewSlot(item, item.CurrentStackSize);
+        }
+    }
+    private void AddStackableItem(ItemManager pickedUpItem)
+    {
+        stackableCheckedAndAdded = false;
+        Debug.Log($"Picked up item stack size: {pickedUpItem.CurrentStackSize}.");
+        // Debug.Log($"===>>> Stack check, at the start: {stackableCheckedAndAdded} <<<===");
+        for (int i = 0; i < items.Count; i++)
+        {
+            // NOTE: The item that was picked up is referenced by pickedUpItem
+            Debug.Log($"Inventar item [i]: {items[i].itemName} \nwith stack size: {items[i].CurrentStackSize}");
+            if (items[i].itemID == pickedUpItem.itemID)
+            {
+                Debug.Log($"Found existing stack of {pickedUpItem.itemName} in inventory at slot {i + 1}. Stack size: {items[i].CurrentStackSize}");
+                int tempStack = items[i].CurrentStackSize + pickedUpItem.CurrentStackSize;
+                if (items[i].CurrentStackSize == items[i].GetMaxStackSize)
+                {
+                    Debug.Log($"{items[i].itemName} stack at slot {i + 1} is already at max size ({items[i].GetMaxStackSize}).");
+                    continue;
+                }
+                // else if (tempStack != inventarItem.GetMaxStackSize)
+                else
+                {
+                    Debug.Log($"Current stack size before adding: {items[i].CurrentStackSize}");
+                    // int tempStack = inventarItem.CurrentStackSize + pickedUpItem.CurrentStackSize;
+                    Debug.Log($"Temp stack size after adding: {tempStack}");
+                    if (tempStack < items[i].GetMaxStackSize)
+                    {
+                        Debug.Log("Item stack is smaller than max stack size.");
+                        items[i].CurrentStackSize = tempStack;
+                        Debug.Log($"Inventar item stack size: {items[i].CurrentStackSize}");
+                        UpdateInventoryUI(inventarSlot: i, stackSize: items[i].CurrentStackSize);
+                        Debug.Log($"Stacked {tempStack} of {pickedUpItem.itemName}. New stack size: {items[i].CurrentStackSize}.");
+                        stackableCheckedAndAdded = true;
+                        Debug.Log($"===>>> Stack check, smaller than max size: {stackableCheckedAndAdded} <<<===");
+                        return;
+                    }
+                    else
+                    {
+
+                        items[i].CurrentStackSize = items[i].GetMaxStackSize;
+                        Debug.Log("Item stack exceeds max stack size.");
+                        int newStackSize = tempStack - items[i].GetMaxStackSize;
+                        Debug.Log($"Stack size: {tempStack}. NewStack: {newStackSize}");
+                        if (newStackSize != 0)
+                        {
+                            AddItemToNewSlot(pickedUpItem, newStackSize);
+                        }
+                        UpdateInventoryUI(inventarSlot: i, stackSize: items[i].CurrentStackSize);
+                        stackableCheckedAndAdded = true;
+                        Debug.Log($"===>>> Stack check, bigger than max size: {stackableCheckedAndAdded} <<<===");
+
+                        return;
+                    }
+                }
+            }
+            else stackableCheckedAndAdded = false;
+        }
+    }
+
+    private void AddItemToNewSlot(ItemManager item, int stackSize)
+    {
+        if (items.Count < MenuManager.instance.AvailableInventorySlots)
+        {
+            ItemManager newItem = Instantiate(item);
+            newItem.CurrentStackSize = stackSize;
+            items.Add(newItem);
+            UpdateInventoryUI(inventarSlot: items.Count - 1, stackSize: newItem.CurrentStackSize);
+            //TEMP: this line is just temporary for testing
+            Debug.Log($"Added {item.itemName} to empty position in Inventory with stack size: {newItem.CurrentStackSize}.");
+            return;
+        }
+    }
+
+    private void UpdateInventoryUI(int inventarSlot, int stackSize)
+    {
+        MenuManager.instance.UpdateInventoryUI(inventarSlotIndex: inventarSlot, stackSize: stackSize);
     }
 
     private int GetItemCount()
@@ -94,19 +175,78 @@ public class Inventory : MonoBehaviour
 
     }
 
-    public ItemManager GetItemDetails(int slotIndex)
+    public ItemManager GetItemDetails(int inventarSlotIndex)
     {
-        if (items[slotIndex] != null)
+        if (items.Count > 0)
         {
-            //TEMP: this line is just temporary for testing
-            // Debug.Log($"Item Details: Name: {items[slotIndex].itemName}, Description: {items[slotIndex].itemDescription}, Type: {items[slotIndex].itemType}");
-            return items[slotIndex];
+            if (items[inventarSlotIndex] != null)
+            {
+                //TEMP: this line is just temporary for testing
+                // Debug.Log($"Item Details: Name: {items[inventarSlotIndex].itemName}, Description: {items[inventarSlotIndex].itemDescription}, Type: {items[inventarSlotIndex].itemType}");
+                return items[inventarSlotIndex];
+            }
+            else
+            {
+                //TEMP: this line is just temporary for testing
+                Debug.Log("Inventory slot is empty.");
+                return null;
+            }
         }
         else
         {
             //TEMP: this line is just temporary for testing
-            Debug.Log("No item in this slot.");
+            Debug.Log("Inventory slot is empty.");
             return null;
         }
     }
+
+    public void ShowItemDetails(int inventarSlot)
+    {
+        Debug.Log($"ShowItemDetails ==> Showing item details for slot {inventarSlot}.");
+        Debug.Log($"MenuManager.instance is {(MenuManager.instance != null ? "not null" : "null")}");
+        Debug.Log($"Items count is {items.Count}.");
+        if (items.Count > 0)
+        {
+            ItemManager item = GetItemDetails(inventarSlot);
+
+
+            if (item == null)
+            {
+                Debug.Log("Inventory slot is empty.");
+                return;
+            }
+
+            if (MenuManager.instance != null && item != null)
+            {
+                if (item.itemType == ItemManager.ItemType.Consumable)
+                    MenuManager.instance.SetEquipOrUseButtonText("USE");
+
+                else if (item.itemType == ItemManager.ItemType.Equipment)
+                    MenuManager.instance.SetEquipOrUseButtonText("EQUIP");
+
+                else
+                    MenuManager.instance.SetEquipOrUseButtonText("HIDE");
+
+                Debug.Log($"ShowItemDetails ==> Showing details for item: {item.itemName}");
+                itemDetailsStackSize.text = item.CurrentStackSize.ToString();
+                itemDetailsName.text = item.itemName;
+                itemDetailsDescription.text = item.itemDescription;
+                itemDetailHP.text = "HP: " + item.itemHPBoost.ToString();
+                itemDetailMP.text = "MP: " + item.itemMPBoost.ToString();
+                itemDetailStrength.text = "Strength: " + item.itemStrengthBoost.ToString();
+                itemDetailIntelligence.text = "Intelligence: " + item.itemIntelligenceBoost.ToString();
+                itemDetailSpecialAttribute.text = "NONE!";
+                itemDetailCrit.text = "Crit: " + item.itemCritBoost.ToString();
+                itemDetailPhysicalDEF.text = "Physical DEF: " + item.itemPhysicalDEFBoost.ToString();
+                itemDetailMagicDEF.text = "Magic DEF: " + item.itemMagicDEFBoost.ToString();
+
+            }
+        }
+        else
+        {
+            Debug.Log("Inventory is empty.");
+        }
+    }
+
+    public int GetInventoryItemCount => items.Count;
 }

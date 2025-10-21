@@ -12,7 +12,13 @@ public class MenuManager : MonoBehaviour
 {
   public static MenuManager instance;
 
-  [SerializeField] UnityEngine.UI.Button[] itemButtons = new UnityEngine.UI.Button[27];
+  [SerializeField] UnityEngine.UI.Button equipOrUseButton;
+  [SerializeField] UnityEngine.UI.Button discardButton;
+  [SerializeField] UnityEngine.UI.Button firstItemButton;
+
+  // TODO: Remove the commented-out line. If itemButtonsList below works, this is no longer needed
+  // [SerializeField] UnityEngine.UI.Button[] itemButtons = new UnityEngine.UI.Button[27];
+  [SerializeField] List<UnityEngine.UI.Button> itemButtonsList = new List<UnityEngine.UI.Button>();
   [SerializeField] UnityEngine.UI.Image image;
   [SerializeField] Animator animator;
   [SerializeField] GameObject menuCanvas;
@@ -48,6 +54,7 @@ public class MenuManager : MonoBehaviour
   void Start()
   {
     CreateInstance();
+    AddItemButtons(2);
 
     image.enabled = true;
     image = GetComponentInChildren<UnityEngine.UI.Image>();
@@ -59,7 +66,7 @@ public class MenuManager : MonoBehaviour
 
     if (Input.GetKeyDown(KeyCode.U))
     {
-
+      AddItemButtons(1);
     }
 
     if (playerStats == null || playerStats.Length == 0)
@@ -80,6 +87,24 @@ public class MenuManager : MonoBehaviour
     }
     ManageMenuCanvas();
 
+  }
+
+  private void AddItemButtons(int buttonAmount)
+  {
+    firstItemButton.onClick.RemoveAllListeners();
+    firstItemButton.GetComponentInChildren<TextMeshProUGUI>().text = "";
+    for (int i = 0; i < buttonAmount; i++)
+    {
+      UnityEngine.UI.Button newButton = Instantiate(firstItemButton, firstItemButton.transform.parent);
+
+      int buttonIndex = itemButtonsList.Count;
+      // if (buttonIndex < 1) buttonIndex = 1;
+      Debug.Log($"Button Index in AddItemButtons: {buttonIndex}");
+      newButton.onClick.AddListener(() => Inventory.instance.ShowItemDetails(buttonIndex));
+      newButton.GetComponentInChildren<TextMeshProUGUI>().text = "";
+      newButton.gameObject.SetActive(true);
+      itemButtonsList.Add(newButton);
+    }
   }
 
   public void UpdateStats()
@@ -152,20 +177,12 @@ public class MenuManager : MonoBehaviour
     }
   }
 
-  public void UpdateInventoryUI(int slotIndex)
+  public void UpdateInventoryUI(int inventarSlotIndex, int stackSize)
   {
-    if (Inventory.instance.GetItemDetails(slotIndex) != null)
+    if (Inventory.instance.GetItemDetails(inventarSlotIndex) != null)
     {
-      itemButtons[slotIndex].image.sprite = Inventory.instance.GetItemDetails(slotIndex).itemIcon;
-      if (ItemManager.instance != null && ItemManager.instance.GetIsStackable)
-      {
-        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = Inventory.instance.GetItemDetails(slotIndex).CurrentStackSize.ToString();
-      }
-      else
-      {
-        itemButtons[slotIndex].GetComponentInChildren<TextMeshProUGUI>().text = "1";
-        // itemButtons[slotIndex].image.sprite = Inventory.instance.GetItemDetails(slotIndex).itemIcon;
-      }
+      itemButtonsList[inventarSlotIndex].image.sprite = Inventory.instance.GetItemDetails(inventarSlotIndex).itemIcon;
+      itemButtonsList[inventarSlotIndex].GetComponentInChildren<TextMeshProUGUI>().text = stackSize.ToString();
     }
   }
 
@@ -218,6 +235,38 @@ public class MenuManager : MonoBehaviour
   public bool GetMenuCanvasState()
   {
     return menuCanvas.activeInHierarchy;
+  }
+
+  public void SetEquipOrUseButtonText(string buttonText)
+  {
+    Debug.Log($"SetEquipOrUseButtonText called with argument: {buttonText}");
+
+    // Null check for equipOrUseButton
+    if (equipOrUseButton == null)
+    {
+      Debug.LogError("equipOrUseButton is null! Make sure it's assigned in the inspector.");
+      return;
+    }
+
+    if (buttonText == "HIDE")
+    {
+      equipOrUseButton.gameObject.SetActive(false);
+    }
+    else
+    {
+      equipOrUseButton.gameObject.SetActive(true);
+
+      // Null check for TextMeshProUGUI component
+      var textComponent = equipOrUseButton.GetComponentInChildren<TextMeshProUGUI>();
+      if (textComponent == null)
+      {
+        Debug.LogError("TextMeshProUGUI component not found in equipOrUseButton children!");
+        return;
+      }
+
+      textComponent.text = buttonText;
+      Debug.Log($"Equip/Use button text set to: {textComponent.text}");
+    }
   }
 
   #region Getter and Setter
@@ -325,7 +374,7 @@ public class MenuManager : MonoBehaviour
     set => dSMagicEvasion = value;
   }
 
-  public int GetItemButtonCount => itemButtons.Length;
+  public int AvailableInventorySlots => itemButtonsList.Count;
 
   #endregion
 }
