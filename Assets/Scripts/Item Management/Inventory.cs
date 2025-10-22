@@ -181,20 +181,15 @@ public class Inventory : MonoBehaviour
         {
             if (items[inventarSlotIndex] != null)
             {
-                //TEMP: this line is just temporary for testing
-                // Debug.Log($"Item Details: Name: {items[inventarSlotIndex].itemName}, Description: {items[inventarSlotIndex].itemDescription}, Type: {items[inventarSlotIndex].itemType}");
                 return items[inventarSlotIndex];
             }
             else
             {
-                //TEMP: this line is just temporary for testing
-                Debug.Log("Inventory slot is empty.");
                 return null;
             }
         }
         else
         {
-            //TEMP: this line is just temporary for testing
             Debug.Log("Inventory slot is empty.");
             return null;
         }
@@ -202,9 +197,6 @@ public class Inventory : MonoBehaviour
 
     public void ShowItemDetails(int inventarSlot)
     {
-        Debug.Log($"ShowItemDetails ==> Showing item details for slot {inventarSlot}.");
-        Debug.Log($"MenuManager.instance is {(MenuManager.instance != null ? "not null" : "null")}");
-        Debug.Log($"Items count is {items.Count}.");
         if (items.Count > 0)
         {
             ItemManager item = GetItemDetails(inventarSlot);
@@ -212,7 +204,6 @@ public class Inventory : MonoBehaviour
 
             if (item == null)
             {
-                Debug.Log("Inventory slot is empty.");
                 return;
             }
 
@@ -227,7 +218,6 @@ public class Inventory : MonoBehaviour
                 else
                     MenuManager.instance.SetEquipOrUseButtonText("HIDE");
 
-                Debug.Log($"ShowItemDetails ==> Showing details for item: {item.itemName}");
                 itemDetailsStackSize.text = item.CurrentStackSize.ToString();
                 itemDetailsName.text = item.itemName;
                 itemDetailsDescription.text = item.itemDescription;
