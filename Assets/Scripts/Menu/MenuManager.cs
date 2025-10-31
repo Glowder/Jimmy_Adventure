@@ -12,13 +12,12 @@ public class MenuManager : MonoBehaviour
 {
   public static MenuManager instance;
 
+  private int selectedItemIndex;
   [SerializeField] UnityEngine.UI.Button equipOrUseButton;
   [SerializeField] UnityEngine.UI.Button discardButton;
   [SerializeField] UnityEngine.UI.Button firstItemButton;
-
-  // TODO: Remove the commented-out line. If itemButtonsList below works, this is no longer needed
-  // [SerializeField] UnityEngine.UI.Button[] itemButtons = new UnityEngine.UI.Button[27];
-  [SerializeField] List<UnityEngine.UI.Button> itemButtonsList = new List<UnityEngine.UI.Button>();
+  [SerializeField] Sprite inventoryItemFrame;
+  [SerializeField] public List<UnityEngine.UI.Button> itemButtonsList = new List<UnityEngine.UI.Button>();
   [SerializeField] UnityEngine.UI.Image image;
   [SerializeField] Animator animator;
   [SerializeField] GameObject menuCanvas;
@@ -41,6 +40,7 @@ public class MenuManager : MonoBehaviour
   expText = new TextMeshProUGUI[6],
   levelText = new TextMeshProUGUI[6];
   [SerializeField] UnityEngine.UI.Image[] characterImages = new UnityEngine.UI.Image[6];
+  // NOTE: Character Slots in the Stats Menu
   [SerializeField] GameObject[] characterSlots = new GameObject[6];
   #endregion
 
@@ -54,7 +54,9 @@ public class MenuManager : MonoBehaviour
   void Start()
   {
     CreateInstance();
-    AddItemButtons(2);
+    AddItemButtons(16);
+    equipOrUseButton.onClick.AddListener(() => EquipOrUse());
+    discardButton.onClick.AddListener(() => DiscardItem());
 
     image.enabled = true;
     image = GetComponentInChildren<UnityEngine.UI.Image>();
@@ -115,7 +117,6 @@ public class MenuManager : MonoBehaviour
         playerStats = GameManager.instance.GetPlayerStats();
     }
 
-    // The SetPlayerStatsArrayElementsInCanvas() method now handles positioning based on groupPositionNumber
     SetPlayerStatsArrayElementsInCanvas();
   }
 
@@ -126,7 +127,7 @@ public class MenuManager : MonoBehaviour
     if (playerStats == null || playerStats.Length == 0)
       return;
 
-    // First, deactivate all slots
+    // Deactivate all slots
     for (int i = 0; i < characterSlots.Length; i++)
     {
       if (characterSlots[i] != null)
@@ -139,7 +140,7 @@ public class MenuManager : MonoBehaviour
       if (playerStats[i] != null)
       {
         // Get the group position (0-based for direct array indexing)
-        int slotIndex = playerStats[i].GetGroupPositionNumber();
+        int slotIndex = playerStats[i].GroupPositionNumber;
 
         // Make sure the slot index is valid
         if (slotIndex >= 0 && slotIndex < characterSlots.Length && characterSlots[slotIndex] != null)
@@ -147,42 +148,63 @@ public class MenuManager : MonoBehaviour
           characterSlots[slotIndex].SetActive(true);
 
           // Safe null checks for UI elements at the specific slot position
-          if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].GetPlayerName();
-          if (healthText[slotIndex] != null) healthText[slotIndex].text = playerStats[i].GetHealth().ToString() + " / " + playerStats[i].GetMaxHealth().ToString();
+          if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].PlayerName;
+          if (healthText[slotIndex] != null) healthText[slotIndex].text = playerStats[i].Health.ToString() + " / " + playerStats[i].MaxHealth.ToString();
           if (healthSlider[slotIndex] != null)
           {
-            healthSlider[slotIndex].maxValue = playerStats[i].GetMaxHealth();
-            healthSlider[slotIndex].value = playerStats[i].GetHealth();
+            healthSlider[slotIndex].maxValue = playerStats[i].MaxHealth;
+            healthSlider[slotIndex].value = playerStats[i].Health;
           }
-          if (manaText[slotIndex] != null) manaText[slotIndex].text = playerStats[i].GetMana().ToString() + " / " + playerStats[i].GetMaxMana().ToString();
+          if (manaText[slotIndex] != null) manaText[slotIndex].text = playerStats[i].Mana.ToString() + " / " + playerStats[i].MaxMana.ToString();
           if (manaSlider[slotIndex] != null)
           {
-            manaSlider[slotIndex].maxValue = playerStats[i].GetMaxMana();
-            manaSlider[slotIndex].value = playerStats[i].GetMana();
+            manaSlider[slotIndex].maxValue = playerStats[i].MaxMana;
+            manaSlider[slotIndex].value = playerStats[i].Mana;
           }
-          if (expText[slotIndex] != null) expText[slotIndex].text = playerStats[i].GetExperience().ToString() + " / " + playerStats[i].GetMaxXP().ToString();
+          if (expText[slotIndex] != null) expText[slotIndex].text = playerStats[i].Experience.ToString() + " / " + playerStats[i].GetMaxXP().ToString();
           if (expSlider[slotIndex] != null)
           {
             expSlider[slotIndex].maxValue = playerStats[i].GetMaxXP();
-            expSlider[slotIndex].value = playerStats[i].GetExperience();
+            expSlider[slotIndex].value = playerStats[i].Experience;
           }
-          if (levelText[slotIndex] != null) levelText[slotIndex].text = "Level: " + playerStats[i].GetLevel().ToString();
-          if (characterImages[slotIndex] != null) characterImages[slotIndex].sprite = playerStats[i].GetPlayerPortrait();
+          if (levelText[slotIndex] != null) levelText[slotIndex].text = "Level: " + playerStats[i].Level.ToString();
+          if (characterImages[slotIndex] != null) characterImages[slotIndex].sprite = playerStats[i].PlayerPortrait;
         }
         else
         {
-          Debug.LogWarning($"Player {playerStats[i].GetPlayerName()} has invalid groupPositionNumber: {playerStats[i].GetGroupPositionNumber()}");
+          Debug.LogWarning($"Player {playerStats[i].PlayerName} has invalid groupPositionNumber: {playerStats[i].GroupPositionNumber}");
         }
       }
     }
   }
 
-  public void UpdateInventoryUI(int inventarSlotIndex, int stackSize)
+  public void UpdateInventoryUI(int inventorySlotIndex, int stackSize)
   {
-    if (Inventory.instance.GetItemDetails(inventarSlotIndex) != null)
+    if (Inventory.instance.GetItemDetails(inventorySlotIndex) != null)
     {
-      itemButtonsList[inventarSlotIndex].image.sprite = Inventory.instance.GetItemDetails(inventarSlotIndex).itemIcon;
-      itemButtonsList[inventarSlotIndex].GetComponentInChildren<TextMeshProUGUI>().text = stackSize.ToString();
+      itemButtonsList[inventorySlotIndex].image.sprite = Inventory.instance.GetItemDetails(inventorySlotIndex).itemIcon;
+      itemButtonsList[inventorySlotIndex].GetComponentInChildren<TextMeshProUGUI>().text = stackSize.ToString();
+    }
+  }
+
+  public void ClearInventoryUI()
+  {
+    if (itemButtonsList == null)
+      return;
+
+    foreach (var itemButton in itemButtonsList)
+    {
+      var item = Inventory.instance.GetItemDetails(itemButtonsList.IndexOf(itemButton));
+      if (item != null)
+      {
+        itemButton.image.sprite = item.itemIcon;
+        itemButton.GetComponentInChildren<TextMeshProUGUI>().text = item.CurrentStackSize.ToString();
+      }
+      else
+      {
+        itemButton.image.sprite = inventoryItemFrame;
+        itemButton.GetComponentInChildren<TextMeshProUGUI>().text = "";
+      }
     }
   }
 
@@ -237,14 +259,45 @@ public class MenuManager : MonoBehaviour
     return menuCanvas.activeInHierarchy;
   }
 
+  // FIND: EquipOrUse
+  public void EquipOrUse()
+  {
+    if (Inventory.instance != null && instance != null && ItemMenuManager.instance != null)
+    {
+      int itemIndex = SelectedItemIndex;
+      ItemManager item = Inventory.instance.GetItemDetails(itemIndex);
+      ItemManager.ItemType consumable = ItemManager.ItemType.Consumable;
+      ItemManager.ItemType equipment = ItemManager.ItemType.Equipment;
+      Inventory inventory = Inventory.instance;
+
+      if (item != null)
+      {
+        if (item.itemType == consumable)
+        {
+          inventory.UseConsumableItem(itemIndex);
+        }
+        else if (item.itemType == equipment)
+        {
+          inventory.EquipItem(itemIndex);
+          equipOrUseButton.interactable = false;
+          discardButton.interactable = false;
+          ItemMenuManager.instance.ChooseCharPanel = true;
+        }
+      }
+    }
+  }
+
+  // FIND: DiscardItem
+  public void DiscardItem()
+  {
+    Debug.Log($"Discarding item at index: {SelectedItemIndex}");
+    ItemMenuManager.instance.ChoosingItemAmount(Inventory.instance.GetItemDetails(SelectedItemIndex));
+  }
   public void SetEquipOrUseButtonText(string buttonText)
   {
-    Debug.Log($"SetEquipOrUseButtonText called with argument: {buttonText}");
-
-    // Null check for equipOrUseButton
     if (equipOrUseButton == null)
     {
-      Debug.LogError("equipOrUseButton is null! Make sure it's assigned in the inspector.");
+      Debug.LogError("equipOrUseButton is null!");
       return;
     }
 
@@ -260,16 +313,19 @@ public class MenuManager : MonoBehaviour
       var textComponent = equipOrUseButton.GetComponentInChildren<TextMeshProUGUI>();
       if (textComponent == null)
       {
-        Debug.LogError("TextMeshProUGUI component not found in equipOrUseButton children!");
         return;
       }
 
       textComponent.text = buttonText;
-      Debug.Log($"Equip/Use button text set to: {textComponent.text}");
     }
   }
 
   #region Getter and Setter
+
+  public Sprite ItemFrame
+  {
+    get => inventoryItemFrame;
+  }
 
   // DS = Detailed Stats
   public UnityEngine.UI.Image DSPortrait
@@ -374,6 +430,11 @@ public class MenuManager : MonoBehaviour
     set => dSMagicEvasion = value;
   }
 
+  public int SelectedItemIndex
+  {
+    get => selectedItemIndex;
+    set => selectedItemIndex = value;
+  }
   public int AvailableInventorySlots => itemButtonsList.Count;
 
   #endregion

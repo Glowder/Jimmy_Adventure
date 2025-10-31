@@ -13,9 +13,9 @@ public class GameManager : MonoBehaviour
 
   // Update is called once per frame
   void Update()
-  {
-
-  }
+    {
+        
+    }
 
   private void CreateInstanceAndKeepAlive()
   {
@@ -31,6 +31,12 @@ public class GameManager : MonoBehaviour
 
   public PlayerStats[] GetPlayerStats()
   {
-    return playerStats;
+    // NOTE: Return sorted PlayerStats array
+    PlayerStats[] tempStats = new PlayerStats[playerStats.Length];
+    for (int i = 0; i < playerStats.Length; i++)
+        {
+            tempStats[playerStats[i].PlayerGroupPositionNumber] = playerStats[i];
+        }
+    return tempStats;
   }
 }

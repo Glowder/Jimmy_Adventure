@@ -4,6 +4,8 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
   public static PlayerStats instance;
+  private Dictionary<string, ItemManager> playerEquipment = new Dictionary<string, ItemManager>(6);
+  public readonly int maxEquipmentSlots = 6;
   [SerializeField] Sprite playerPortrait;
   [SerializeField] string playerName, playerClass;
   [SerializeField]
@@ -21,6 +23,7 @@ public class PlayerStats : MonoBehaviour
   {
     CreateInstance();
     SetRequieredXPForEachLevel();
+    SetCharacterEquipment();
     // maxXP = requiredXPForEachLevel[currentLevel - 1];
   }
 
@@ -38,7 +41,47 @@ public class PlayerStats : MonoBehaviour
     // Debug.Log("Player instance created from PlayerStats.");
   }
 
+  private void SetCharacterEquipment()
+  {
+    playerEquipment.Add("Head", null);
+    playerEquipment.Add("Chest", null);
+    playerEquipment.Add("Arms", null);
+    playerEquipment.Add("Legs", null);
+    playerEquipment.Add("Weapon", null);
+    playerEquipment.Add("Shield", null);
+  }
 
+  public void EquipItem(string slot, ItemManager item)
+  {
+    if (playerEquipment.ContainsKey(slot))
+    {
+      // NOTE: If player has no equipment at [slot] then the item will be equipped
+      if (playerEquipment[slot] == null)
+      {
+        playerEquipment[slot] = item;
+        Debug.Log($"Equipped {item.itemName} to {slot} slot.");
+      }
+      // NOTE: If player is equipped at [slot] the item at [slot] will be added to inventory and removed from player
+      else if (playerEquipment[slot] != null)
+      {
+        Inventory.instance.AddItem(playerEquipment[slot]);
+        playerEquipment[slot] = item;
+        Debug.Log($"Equipped {item.itemName} to {slot} slot.");
+      }
+    }
+    else
+    {
+      Debug.LogWarning($"Slot {slot} does not exist in player equipment.");
+    }
+  }
+
+  private void UpdatePlayerEquipmentSlot(string slot)
+  {
+    if (playerEquipment[slot] == null)
+    {
+
+    }
+  }
   private void SetRequieredXPForEachLevel()
   {
     // Clears the list to avoid duplicates when relading the scene.
@@ -75,7 +118,7 @@ public class PlayerStats : MonoBehaviour
         currentXP -= requiredXPForEachLevel[levelIndex];
         currentLevel++;
         // Debug.Log($"Player leveled up! New Level: {currentLevel}");
-        
+
         // Safe access for next level XP display
         if (currentLevel - 1 < requiredXPForEachLevel.Count)
         {
@@ -129,86 +172,104 @@ public class PlayerStats : MonoBehaviour
 
 
   #region Getters
-  public int GetCritChance()
+
+  public int PlayerGroupPositionNumber => groupPositionNumber;
+  public int MaxEquipmentSlots
   {
-    return crit;
+    get => maxEquipmentSlots;
   }
-  public string GetPlayerName()
+  public int CritChance
   {
-    return playerName;
+    get => crit;
+    set => crit = value;
+  }
+  public string PlayerName
+  {
+    get => playerName;
   }
 
-  public Sprite GetPlayerPortrait()
+  public Sprite PlayerPortrait
   {
-    return playerPortrait;
+    get => playerPortrait;
   }
 
-  public int GetHealth()
+  public int Health
   {
-    return currentHP;
+    get => currentHP;
+    set => currentHP = value;
   }
 
-  public int GetMana()
+  public int Mana
   {
-    return currentMP;
+    get => currentMP;
+    set => currentMP = value;
   }
 
-  public int GetExperience()
+  public int Experience
   {
-    return currentXP;
+    get => currentXP;
+    set => currentXP = value;
   }
 
-  public int GetLevel()
+  public int Level
   {
-    return currentLevel;
+    get => currentLevel;
+    set => currentLevel = value;
   }
 
-  public int GetDexterity()
+  public int Dexterity
   {
-    return dexterity;
+    get => dexterity;
+    set => dexterity = value;
   }
-  public int GetGroupPositionNumber()
+  public int GroupPositionNumber
   {
-    return groupPositionNumber;
+    get => groupPositionNumber;
   }
-  public string GetPlayerClass()
+  public string PlayerClass
   {
-    return playerClass;
+    get => playerClass;
   }
-  public int GetMaxHealth()
+  public int MaxHealth
   {
-    return maxHP;
+    get => maxHP;
+    set => maxHP = value;
   }
-  public int GetMaxMana()
+  public int MaxMana
   {
-    return maxMP;
+    get => maxMP;
+    set => maxMP = value;
   }
-  public int GetStrength()
+  public int Strength
   {
-    return strength;
+    get => strength;
+    set => strength = value;
   }
-  public int GetIntelligence()
+  public int Intelligence
   {
-    return intelligence;
+    get => intelligence;
+    set => intelligence = value;
   }
-  public int GetPhysicalDEF()
+  public int PhysicalDEF
   {
-    return physicalDEF;
+    get => physicalDEF;
+    set => physicalDEF = value;
   }
-  public int GetMagicalDEF()
+  public int MagicalDEF
   {
-    return magicDEF;
+    get => magicDEF;
+    set => magicDEF = value;
   }
-  public int GetMaxLevel()
+  public int MaxLevel
   {
-    return maxLevel;
+    get => maxLevel;
   }
   public int GetMaxXP()
   {
     // Safety checks
     if (currentLevel < 1)
       currentLevel = 1;
-    
+
     if (requiredXPForEachLevel == null || requiredXPForEachLevel.Count == 0)
     {
       Debug.LogWarning("requiredXPForEachLevel list is empty or null!");
@@ -218,19 +279,21 @@ public class PlayerStats : MonoBehaviour
     // Ensure we don't go out of bounds and use 0-based indexing
     int levelIndex = Mathf.Min(currentLevel - 1, requiredXPForEachLevel.Count - 1);
     levelIndex = Mathf.Max(0, levelIndex); // Ensure index is never negative
-    
+
     maxXP = requiredXPForEachLevel[levelIndex];
     return maxXP;
   }
 
-  public int GetPhysicalEvasion()
+  public int PhysicalEvasion
   {
-    return physicalEvasion;
+    get => physicalEvasion;
+    set => physicalEvasion = value;
   }
 
-  public int GetMagicalEvasion()
+  public int MagicalEvasion
   {
-    return magicEvasion;
+    get => magicEvasion;
+    set => magicEvasion = value;
   }
   #endregion
 

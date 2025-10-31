@@ -105,17 +105,17 @@ public class DialogHandler : MonoBehaviour
     switch (playerName)
     {
       case "Jimmy":
-        return (playerStats.Length > 0 && playerStats[0] != null) ? playerStats[0].GetPlayerPortrait() : null;
+        return (playerStats.Length > 0 && playerStats[0] != null) ? playerStats[0].PlayerPortrait : null;
       case "Ninja":
-        return (playerStats.Length > 1 && playerStats[1] != null) ? playerStats[1].GetPlayerPortrait() : null;
+        return (playerStats.Length > 1 && playerStats[1] != null) ? playerStats[1].PlayerPortrait : null;
       case "Ranger":
-        return (playerStats.Length > 2 && playerStats[2] != null) ? playerStats[2].GetPlayerPortrait() : null;
+        return (playerStats.Length > 2 && playerStats[2] != null) ? playerStats[2].PlayerPortrait : null;
       case "Warrior":
-        return (playerStats.Length > 3 && playerStats[3] != null) ? playerStats[3].GetPlayerPortrait() : null;
+        return (playerStats.Length > 3 && playerStats[3] != null) ? playerStats[3].PlayerPortrait : null;
       case "Mage":
-        return (playerStats.Length > 4 && playerStats[4] != null) ? playerStats[4].GetPlayerPortrait() : null;
+        return (playerStats.Length > 4 && playerStats[4] != null) ? playerStats[4].PlayerPortrait : null;
       case "Cleric":
-        return (playerStats.Length > 5 && playerStats[5] != null) ? playerStats[5].GetPlayerPortrait() : null;
+        return (playerStats.Length > 5 && playerStats[5] != null) ? playerStats[5].PlayerPortrait : null;
 
       default:
         return null;
@@ -140,16 +140,16 @@ public class DialogHandler : MonoBehaviour
     {
       if (playerStats[i] != null)
       {
-        int targetPosition = playerStats[i].GetGroupPositionNumber();
+        int targetPosition = playerStats[i].GroupPositionNumber;
         // Make sure the target position is within bounds
         if (targetPosition >= 0 && targetPosition < sortedPlayerStats.Length)
         {
           sortedPlayerStats[targetPosition] = playerStats[i];
-          Debug.Log($"Placed {playerStats[i].GetPlayerName()} (from array index {i}) at position {targetPosition}");
+          Debug.Log($"Placed {playerStats[i].PlayerName} (from array index {i}) at position {targetPosition}");
         }
         else
         {
-          Debug.LogWarning($"Player {playerStats[i].GetPlayerName()} has invalid groupPositionNumber: {targetPosition}");
+          Debug.LogWarning($"Player {playerStats[i].PlayerName} has invalid groupPositionNumber: {targetPosition}");
         }
       }
     }
@@ -174,28 +174,28 @@ public class DialogHandler : MonoBehaviour
     {
       if (playerStats[i] != null)
       {
-        int targetPosition = playerStats[i].GetGroupPositionNumber();
+        int targetPosition = playerStats[i].GroupPositionNumber;
         // Make sure the target position is within bounds
         if (targetPosition >= 0 && targetPosition < sortedPlayerStats.Length)
         {
           sortedPlayerStats[targetPosition] = playerStats[i];
-          Debug.Log($"Placed {playerStats[i].GetPlayerName()} at position {targetPosition}");
+          Debug.Log($"Placed {playerStats[i].PlayerName} at position {targetPosition}");
         }
         else
         {
-          Debug.LogWarning($"Player {playerStats[i].GetPlayerName()} has invalid groupPositionNumber: {targetPosition}");
+          Debug.LogWarning($"Player {playerStats[i].PlayerName} has invalid groupPositionNumber: {targetPosition}");
         }
       }
     }
 
     if (DialogControl.instance != null)
     {
-      DialogControl.instance.SetTestImageAndName(sortedPlayerStats[testIndex].GetPlayerPortrait(), sortedPlayerStats[testIndex].GetPlayerName());
+      DialogControl.instance.SetTestImageAndName(sortedPlayerStats[testIndex].PlayerPortrait, sortedPlayerStats[testIndex].PlayerName);
     }
     else Debug.Log("DialogControl.instance is null");
 
-    Debug.Log($"Player at index {testIndex} is: {sortedPlayerStats[testIndex].GetPlayerName()}");
-    Debug.Log($"Player at index {testIndex} is: {sortedPlayerStats[testIndex].GetPlayerPortrait()}");
+    Debug.Log($"Player at index {testIndex} is: {sortedPlayerStats[testIndex].PlayerName}");
+    Debug.Log($"Player at index {testIndex} is: {sortedPlayerStats[testIndex].PlayerPortrait}");
 
     return sortedPlayerStats;
   }
