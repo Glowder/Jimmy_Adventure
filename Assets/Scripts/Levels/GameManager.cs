@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     DontDestroyOnLoad(this.gameObject);
   }
 
-  public PlayerStats[] GetPlayerStats()
+  public PlayerStats[] GetSortedPlayerStats()
   {
     // NOTE: Return sorted PlayerStats array
     PlayerStats[] tempStats = new PlayerStats[playerStats.Length];

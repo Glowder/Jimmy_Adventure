@@ -54,9 +54,7 @@ public class MenuManager : MonoBehaviour
   void Start()
   {
     CreateInstance();
-    AddItemButtons(16);
-    equipOrUseButton.onClick.AddListener(() => EquipOrUse());
-    discardButton.onClick.AddListener(() => DiscardItem());
+    AddListenerToButtons();
 
     image.enabled = true;
     image = GetComponentInChildren<UnityEngine.UI.Image>();
@@ -74,7 +72,7 @@ public class MenuManager : MonoBehaviour
     if (playerStats == null || playerStats.Length == 0)
     {
       if (GameManager.instance != null)
-        playerStats = GameManager.instance.GetPlayerStats();
+        playerStats = GameManager.instance.GetSortedPlayerStats();
     }
 
     // Only update UI elements if we have valid player stats
@@ -93,6 +91,23 @@ public class MenuManager : MonoBehaviour
 
   private void AddItemButtons(int buttonAmount)
   {
+    int MAX_SIZE = 32;
+    int MIN_SIZE = 8;
+    if (itemButtonsList.Count >= MAX_SIZE)
+    {
+      Debug.Log("Maximum item buttons reached. Cannot add more.");
+      return;
+    }
+
+    if (buttonAmount + itemButtonsList.Count > MAX_SIZE)
+    {
+      buttonAmount = MAX_SIZE - itemButtonsList.Count;
+    }
+    else if (buttonAmount + itemButtonsList.Count < MIN_SIZE)
+    {
+      buttonAmount = MIN_SIZE - itemButtonsList.Count;
+    }
+
     firstItemButton.onClick.RemoveAllListeners();
     firstItemButton.GetComponentInChildren<TextMeshProUGUI>().text = "";
     for (int i = 0; i < buttonAmount; i++)
@@ -100,24 +115,12 @@ public class MenuManager : MonoBehaviour
       UnityEngine.UI.Button newButton = Instantiate(firstItemButton, firstItemButton.transform.parent);
 
       int buttonIndex = itemButtonsList.Count;
-      // if (buttonIndex < 1) buttonIndex = 1;
-      Debug.Log($"Button Index in AddItemButtons: {buttonIndex}");
+      // Debug.Log($"Button Index in AddItemButtons: {buttonIndex}");
       newButton.onClick.AddListener(() => Inventory.instance.ShowItemDetails(buttonIndex));
       newButton.GetComponentInChildren<TextMeshProUGUI>().text = "";
       newButton.gameObject.SetActive(true);
       itemButtonsList.Add(newButton);
     }
-  }
-
-  public void UpdateStats()
-  {
-    if (playerStats == null || playerStats.Length == 0)
-    {
-      if (GameManager.instance != null)
-        playerStats = GameManager.instance.GetPlayerStats();
-    }
-
-    SetPlayerStatsArrayElementsInCanvas();
   }
 
   // Find and set all the UI elements in the menu canvas to their respective lists
@@ -148,7 +151,7 @@ public class MenuManager : MonoBehaviour
           characterSlots[slotIndex].SetActive(true);
 
           // Safe null checks for UI elements at the specific slot position
-          if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].PlayerName;
+          if (nameText[slotIndex] != null) nameText[slotIndex].text = playerStats[i].PlayerName + " Ora Ora Ora";
           if (healthText[slotIndex] != null) healthText[slotIndex].text = playerStats[i].Health.ToString() + " / " + playerStats[i].MaxHealth.ToString();
           if (healthSlider[slotIndex] != null)
           {
@@ -214,7 +217,7 @@ public class MenuManager : MonoBehaviour
     {
 
       if (GameManager.instance != null)
-        playerStats = GameManager.instance.GetPlayerStats();
+        playerStats = GameManager.instance.GetSortedPlayerStats();
 
       if (!menuCanvas.activeInHierarchy && !DialogControl.instance.GetDialogBoxState())
       {
@@ -259,8 +262,14 @@ public class MenuManager : MonoBehaviour
     return menuCanvas.activeInHierarchy;
   }
 
+  private void AddListenerToButtons()
+  {
+    AddItemButtons(16);
+    discardButton.onClick.AddListener(() => DiscardItem());
+  }
+
   // FIND: EquipOrUse
-  public void EquipOrUse()
+  public void EquipOrUse(int playerIndex, string equipOrRemove)
   {
     if (Inventory.instance != null && instance != null && ItemMenuManager.instance != null)
     {
@@ -274,14 +283,11 @@ public class MenuManager : MonoBehaviour
       {
         if (item.itemType == consumable)
         {
-          inventory.UseConsumableItem(itemIndex);
+          inventory.UseConsumableItem(itemIndex: itemIndex, playerIndex: playerIndex);
         }
         else if (item.itemType == equipment)
         {
-          inventory.EquipItem(itemIndex);
-          equipOrUseButton.interactable = false;
-          discardButton.interactable = false;
-          ItemMenuManager.instance.ChooseCharPanel = true;
+          inventory.EquipItemLogic(itemIndex: itemIndex, playerIndex: playerIndex, equipOrRemove: equipOrRemove);
         }
       }
     }
@@ -322,10 +328,9 @@ public class MenuManager : MonoBehaviour
 
   #region Getter and Setter
 
-  public Sprite ItemFrame
-  {
-    get => inventoryItemFrame;
-  }
+  public bool MenuCanvasActive => menuCanvas.activeInHierarchy;
+
+  public Sprite ItemFrame => inventoryItemFrame;
 
   // DS = Detailed Stats
   public UnityEngine.UI.Image DSPortrait

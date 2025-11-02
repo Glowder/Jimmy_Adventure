@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Microsoft.Unity.VisualStudio.Editor;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -19,19 +19,24 @@ public class ItemMenuManager : MonoBehaviour
     [SerializeField] TMP_InputField choosingAmountText;
 
     [SerializeField] UnityEngine.UI.Button reduceAmountButton, increaseAmountButton, confirmAmountButton, cancelAmountButton;
+    [SerializeField] UnityEngine.UI.Button[] chooseCharButtons = new UnityEngine.UI.Button[6];
+
+    private bool chooseCharPanelUpdate = false;
+
     // FIXME: Start
     void Start()
     {
         CreateInstance();
         AmountPanelButtonFunctions();
         EquipmentUIElements();
+        ChooseCharPanelSetup();
         choosingAmountText.text = "0";
     }
 
     // FIXME: Update
     void Update()
     {
-
+        ChooseCharPanelSetup();
     }
 
     private void EquipmentUIElements()
@@ -46,11 +51,16 @@ public class ItemMenuManager : MonoBehaviour
 
     public void SetEquipmentUIElements(string setOrRemove, string slot, Sprite sprite)
     {
-        if (setOrRemove == "Set" || setOrRemove == "set")
-            equipmentUI[slot].GetComponentInChildren<UnityEngine.UI.Image>().sprite = sprite;
+        if (MenuManager.instance != null && instance != null)
+        {
+            UnityEngine.UI.Image icon = equipmentUI[slot]?.GetComponentInChildren<UnityEngine.UI.Image>();
 
-        if (setOrRemove == "remove" || setOrRemove == "Remove")
-            equipmentUI[slot].GetComponentInChildren<UnityEngine.UI.Image>().sprite = MenuManager.instance.ItemFrame;
+            if (setOrRemove.Equals("Set", StringComparison.OrdinalIgnoreCase))
+                icon.sprite = sprite;
+
+            if (setOrRemove.Equals("Remove", StringComparison.OrdinalIgnoreCase))
+                icon.sprite = MenuManager.instance.ItemFrame;
+        }
     }
 
     public void ChoosingItemAmount(ItemManager item)
@@ -134,16 +144,49 @@ public class ItemMenuManager : MonoBehaviour
         }
     }
 
-    // public void ChooseCharPanel(bool show)
-    // {
-    //     chooseCharPanel.SetActive(show);
-    // }
-
-    public bool ChooseCharPanel
+    public void ChooseCharPanelSetup()
     {
-        get { return chooseCharPanel.activeSelf; }
-        set { chooseCharPanel.SetActive(value); }
+        if (GameManager.instance != null && PlayerStats.instance != null && MenuManager.instance != null)
+        {
+            // Check if the character selection panel is active and not yet updated
+            if (MenuManager.instance.MenuCanvasActive && !chooseCharPanelUpdate)
+            {
+                PlayerStats[] playerStats = GameManager.instance.GetSortedPlayerStats();
+
+                for (int i = 0; i < chooseCharButtons.Length - 1; i++)
+                {
+                    if (chooseCharButtons[i] == null)
+                    {
+                        Debug.LogError($"chooseCharButtons[{i}] is null!");
+                        continue;
+                    }
+                    if (i < playerStats.Length && playerStats[i] != null)
+                    {
+                        chooseCharButtons[i].gameObject.SetActive(true);
+                        chooseCharButtons[i].image.sprite = playerStats[i].PlayerPortrait;
+                        chooseCharButtons[i].onClick.RemoveAllListeners();
+                    }
+                    else
+                    {
+                        chooseCharButtons[i].gameObject.SetActive(false);
+                        Debug.Log($"No player stats for index {i}, hiding button.");
+                    }
+                }
+                chooseCharPanelUpdate = true;
+            }
+            else if (MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && !chooseCharPanelUpdate)
+            {
+                return;
+            }
+            // NOTE: If the menu is not active, there is no need to update the panel
+            else if (MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive)
+            {
+                chooseCharPanelUpdate = false;
+                Debug.Log("ChooseCharPanelSetup: " + chooseCharPanelUpdate);
+            }
+        }
     }
+
     private void CreateInstance()
     {
         if (instance == null)
@@ -152,4 +195,14 @@ public class ItemMenuManager : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
     }
+
+    #region "Getters and Setters"
+
+
+    public bool ChooseCharPanel
+    {
+        get { return chooseCharPanel.activeSelf; }
+        set { chooseCharPanel.SetActive(value); }
+    }
+    #endregion
 }

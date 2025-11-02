@@ -24,7 +24,6 @@ public class PlayerStats : MonoBehaviour
     CreateInstance();
     SetRequieredXPForEachLevel();
     SetCharacterEquipment();
-    // maxXP = requiredXPForEachLevel[currentLevel - 1];
   }
 
   // Update is called once per frame
@@ -37,8 +36,6 @@ public class PlayerStats : MonoBehaviour
   {
     if (instance == null || instance != this)
       instance = this;
-
-    // Debug.Log("Player instance created from PlayerStats.");
   }
 
   private void SetCharacterEquipment()
@@ -51,7 +48,7 @@ public class PlayerStats : MonoBehaviour
     playerEquipment.Add("Shield", null);
   }
 
-  public void EquipItem(string slot, ItemManager item)
+  public void EquipItemUI(string slot, ItemManager item)
   {
     if (playerEquipment.ContainsKey(slot))
     {
@@ -75,13 +72,6 @@ public class PlayerStats : MonoBehaviour
     }
   }
 
-  private void UpdatePlayerEquipmentSlot(string slot)
-  {
-    if (playerEquipment[slot] == null)
-    {
-
-    }
-  }
   private void SetRequieredXPForEachLevel()
   {
     // Clears the list to avoid duplicates when relading the scene.
@@ -133,24 +123,46 @@ public class PlayerStats : MonoBehaviour
 
   public void SetDetailedStatsValues()
   {
-    MenuManager.instance.DSNameText.text = playerName;
-    MenuManager.instance.DSPortrait.sprite = playerPortrait;
-    MenuManager.instance.DSHealthText.text = currentHP + " / " + maxHP;
-    MenuManager.instance.DSHealthSlider.maxValue = maxHP;
-    MenuManager.instance.DSHealthSlider.value = currentHP;
-    MenuManager.instance.DSManaText.text = currentMP + " / " + maxMP;
-    MenuManager.instance.DSManaSlider.maxValue = maxMP;
-    MenuManager.instance.DSManaSlider.value = currentMP;
-    MenuManager.instance.DSExpText.text = currentXP + " / " + maxXP;
-    MenuManager.instance.DSLevelText.text = "Level: " + currentLevel;
-    MenuManager.instance.DSStrengthText.text = "Strength: " + strength;
-    MenuManager.instance.DSIntelligenceText.text = "Intelligence: " + intelligence;
-    MenuManager.instance.DSCritText.text = "Critical: " + crit + "%";
-    MenuManager.instance.DSDexterityText.text = "Dexterity: " + dexterity;
-    MenuManager.instance.DSPhysicalDEFText.text = "Physical DEF: " + physicalDEF;
-    MenuManager.instance.DSMagicDEFText.text = "Magical DEF: " + magicDEF;
-    MenuManager.instance.DSPhysicalEvasion.text = "Physical Evasion: " + physicalEvasion + "%";
-    MenuManager.instance.DSMagicEvasion.text = "Magical Evasion: " + magicEvasion + "%";
+    if (MenuManager.instance != null && instance != null && ItemMenuManager.instance != null)
+    {
+      MenuManager stats = MenuManager.instance;
+      ItemMenuManager equipmentInventory = ItemMenuManager.instance;
+      string[] equipmentSlots = new string[6] { "Head", "Chest", "Arms", "Legs", "Weapon", "Shield" };
+      string set = "Set";
+      string remove = "Remove";
+
+      stats.DSNameText.text = playerName;
+      stats.DSPortrait.sprite = playerPortrait;
+      stats.DSHealthText.text = currentHP + " / " + maxHP;
+      stats.DSHealthSlider.maxValue = maxHP;
+      stats.DSHealthSlider.value = currentHP;
+      stats.DSManaText.text = currentMP + " / " + maxMP;
+      stats.DSManaSlider.maxValue = maxMP;
+      stats.DSManaSlider.value = currentMP;
+      stats.DSExpText.text = currentXP + " / " + maxXP;
+      stats.DSLevelText.text = "Level: " + currentLevel;
+      stats.DSStrengthText.text = "Strength: \n" + strength;
+      stats.DSIntelligenceText.text = "Intelligence: \n" + intelligence;
+      stats.DSCritText.text = "Critical: \n" + crit + "%";
+      stats.DSDexterityText.text = "Dexterity: \n" + dexterity;
+      stats.DSPhysicalDEFText.text = "Physical DEF: \n" + physicalDEF;
+      stats.DSMagicDEFText.text = "Magical DEF: \n" + magicDEF;
+      stats.DSPhysicalEvasion.text = "Physical Evasion: \n" + physicalEvasion + "%";
+      stats.DSMagicEvasion.text = "Magical Evasion: \n" + magicEvasion + "%";
+
+      for (int i=0; i < playerEquipment.Count; i++)
+      {
+        string slot = equipmentSlots[i];
+        if (playerEquipment[slot] != null)
+        {
+          equipmentInventory.SetEquipmentUIElements(set, slot, playerEquipment[slot].itemIcon);
+        }
+        else
+        {
+          equipmentInventory.SetEquipmentUIElements(remove, slot, stats.ItemFrame);
+        }
+      }
+    }
   }
 
   public void AddStatsAfterLevelUp()
@@ -171,7 +183,7 @@ public class PlayerStats : MonoBehaviour
   }
 
 
-  #region Getters
+  #region "Getters and Setters"
 
   public int PlayerGroupPositionNumber => groupPositionNumber;
   public int MaxEquipmentSlots
@@ -282,6 +294,19 @@ public class PlayerStats : MonoBehaviour
 
     maxXP = requiredXPForEachLevel[levelIndex];
     return maxXP;
+  }
+
+  public ItemManager GetEquipmentAtSlot(string slot)
+  {
+    if (playerEquipment.ContainsKey(slot))
+    {
+      return playerEquipment[slot];
+    }
+    else
+    {
+      Debug.LogWarning($"Slot {slot} does not exist in player equipment.");
+      return null;
+    }
   }
 
   public int PhysicalEvasion

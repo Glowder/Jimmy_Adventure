@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using System.Threading;
-using UnityEditor.Search;
+using System;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
@@ -32,9 +31,16 @@ public class Inventory : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
+            PlayerStats[] playerStats = MenuManager.instance.playerStats;
             // ShowInventoryContents();
-            for (int i = 0; i < MenuManager.instance.playerStats.Length; i++){
-                Debug.Log($"GameManager => Player {i} Name: {MenuManager.instance.playerStats[i].PlayerName} with the Instance ID: {MenuManager.instance.playerStats[i].GetInstanceID()}");
+            for (int i = 0; i < playerStats.Length; i++)
+            {
+                Debug.Log($"{playerStats[i].PlayerName} ==> Head: {playerStats[i].GetEquipmentAtSlot("Head")?.itemName ?? "None"}");
+                Debug.Log($"{playerStats[i].PlayerName} ==> Chest: {playerStats[i].GetEquipmentAtSlot("Chest")?.itemName ?? "None"}");
+                Debug.Log($"{playerStats[i].PlayerName} ==> Arms: {playerStats[i].GetEquipmentAtSlot("Arms")?.itemName ?? "None"}");
+                Debug.Log($"{playerStats[i].PlayerName} ==> Legs: {playerStats[i].GetEquipmentAtSlot("Legs")?.itemName ?? "None"}");
+                Debug.Log($"{playerStats[i].PlayerName} ==> Weapon: {playerStats[i].GetEquipmentAtSlot("Weapon")?.itemName ?? "None"}");
+                Debug.Log($"{playerStats[i].PlayerName} ==> Shield: {playerStats[i].GetEquipmentAtSlot("Shield")?.itemName ?? "None"}");
             }
         }
     }
@@ -246,7 +252,6 @@ public class Inventory : MonoBehaviour
         }
         else
         {
-            Debug.Log("Inventory slot is empty.");
             ResetDetailsPanel("All");
             return null;
         }
@@ -422,37 +427,37 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void UseConsumableItem(int itemIndex)
+    public void UseConsumableItem(int itemIndex, int playerIndex)
     {
         ItemManager item = GetItemDetails(itemIndex);
         ItemManager.ItemType consumable = ItemManager.ItemType.Consumable;
-        PlayerStats player = PlayerStats.instance;
+        PlayerStats[] player = GameManager.instance.GetSortedPlayerStats();
 
         if (item != null)
         {
             if (item.CurrentStackSize > 0 && item.itemType == consumable)
             {
 
-                int tempHealth = player.Health + item.itemHPBoost;
-                int tempMana = player.Mana + item.itemMPBoost;
+                int tempHealth = player[playerIndex].Health + item.itemHPBoost;
+                int tempMana = player[playerIndex].Mana + item.itemMPBoost;
 
                 // Note: Added handling for items that boost only HP
                 if (item.itemHPBoost > 0 && item.itemMPBoost == 0)
                 {
-                    if (player.Health >= player.MaxHealth)
+                    if (player[playerIndex].Health >= player[playerIndex].MaxHealth)
                     {
                         Debug.Log("Player health is already at maximum.");
                         return;
                     }
-                    if (tempHealth > player.MaxHealth)
+                    if (tempHealth > player[playerIndex].MaxHealth)
                     {
-                        player.Health = player.MaxHealth;
+                        player[playerIndex].Health = player[playerIndex].MaxHealth;
                         RemoveItem(itemIndex);
                         MenuManager.instance.ClearInventoryUI();
                     }
                     else
                     {
-                        player.Health = tempHealth;
+                        player[playerIndex].Health = tempHealth;
                         RemoveItem(itemIndex);
                         MenuManager.instance.ClearInventoryUI();
                     }
@@ -460,20 +465,20 @@ public class Inventory : MonoBehaviour
                 // Note: Added handling for items that boost only MP
                 else if (item.itemMPBoost > 0 && item.itemHPBoost == 0)
                 {
-                    if (player.Mana >= player.MaxMana)
+                    if (player[playerIndex].Mana >= player[playerIndex].MaxMana)
                     {
                         Debug.Log("Player mana is already at maximum.");
                         return;
                     }
-                    if (tempMana > player.MaxMana)
+                    if (tempMana > player[playerIndex].MaxMana)
                     {
-                        player.Mana = player.MaxMana;
+                        player[playerIndex].Mana = player[playerIndex].MaxMana;
                         RemoveItem(itemIndex);
                         MenuManager.instance.ClearInventoryUI();
                     }
                     else
                     {
-                        player.Mana = tempMana;
+                        player[playerIndex].Mana = tempMana;
                         RemoveItem(itemIndex);
                         MenuManager.instance.ClearInventoryUI();
                     }
@@ -481,28 +486,28 @@ public class Inventory : MonoBehaviour
                 // Note: Added handling for items that boost both HP and MP
                 else if (item.itemHPBoost > 0 && item.itemMPBoost > 0)
                 {
-                    if (player.Health >= player.MaxHealth && player.Mana >= player.MaxMana)
+                    if (player[playerIndex].Health >= player[playerIndex].MaxHealth && player[playerIndex].Mana >= player[playerIndex].MaxMana)
                     {
                         Debug.Log("Player health and mana are already at maximum.");
                         return;
                     }
                     // Note: First handle HP
-                    if (tempHealth > player.MaxHealth)
+                    if (tempHealth > player[playerIndex].MaxHealth)
                     {
-                        player.Health = player.MaxHealth;
+                        player[playerIndex].Health = player[playerIndex].MaxHealth;
                     }
                     else
                     {
-                        player.Health = tempHealth;
+                        player[playerIndex].Health = tempHealth;
                     }
                     // Note: Then handle MP
-                    if (tempMana > player.MaxMana)
+                    if (tempMana > player[playerIndex].MaxMana)
                     {
-                        player.Mana = player.MaxMana;
+                        player[playerIndex].Mana = player[playerIndex].MaxMana;
                     }
                     else
                     {
-                        player.Mana = tempMana;
+                        player[playerIndex].Mana = tempMana;
                     }
                     RemoveItem(itemIndex);
                     MenuManager.instance.ClearInventoryUI();
@@ -512,8 +517,9 @@ public class Inventory : MonoBehaviour
     }
 
     // FIND: EquipItem
-    public void EquipItem(int itemIndex)
+    public void EquipItemLogic(int itemIndex, int playerIndex, string equipOrRemove)
     {
+        #region "Initial Definitions"
         ItemManager item = GetItemDetails(itemIndex);
         ItemManager.ItemType equipment = ItemManager.ItemType.Equipment;
         // Note: Define equipment types
@@ -529,66 +535,80 @@ public class Inventory : MonoBehaviour
 
         ItemMenuManager equipmentUI = ItemMenuManager.instance;
 
-        PlayerStats player = PlayerStats.instance;
+        PlayerStats[] player = GameManager.instance.GetSortedPlayerStats();
+        #endregion
 
-        if (item != null)
+        if (item == null)
         {
-            if (item.CurrentStackSize > 0 && item.itemType == equipment)
+            Debug.LogError("EquipItem aborted: item is null.");
+            return;
+        }
+        if (equipmentUI == null)
+        {
+            Debug.LogError("EquipItem aborted: equipmentUI is null.");
+            return;
+        }
+        if (player == null)
+        {
+            Debug.LogError("EquipItem aborted: player array is null.");
+            return;
+        }
+
+        if (item != null && player != null && playerIndex >= 0 && playerIndex < player.Length)
+        {
+
+            if (equipOrRemove.Equals("Equip", StringComparison.OrdinalIgnoreCase))
             {
-                // Note: Equip logic goes here
-                player.MaxHealth += item.itemHPBoost;
-                player.MaxMana += item.itemMPBoost;
-                player.Strength += item.itemStrengthBoost;
-                player.CritChance += item.itemCritBoost;
-                player.PhysicalDEF += item.itemPhysicalDEFBoost;
-                player.Intelligence += item.itemIntelligenceBoost;
-                player.MagicalDEF += item.itemMagicDEFBoost;
-                Debug.Log($"Equipped {item.itemName}. Player stats updated.");
-
-                if (item.equipmentType == weapon)
+                if (item.CurrentStackSize > 0 && item.itemType == equipment)
                 {
-                    if (item.equipSlotNeeded == oneHanded)
+                    // Note: Equip logic goes here
+                    player[playerIndex].MaxHealth += item.itemHPBoost;
+                    player[playerIndex].MaxMana += item.itemMPBoost;
+                    player[playerIndex].Strength += item.itemStrengthBoost;
+                    player[playerIndex].CritChance += item.itemCritBoost;
+                    player[playerIndex].PhysicalDEF += item.itemPhysicalDEFBoost;
+                    player[playerIndex].Intelligence += item.itemIntelligenceBoost;
+                    player[playerIndex].MagicalDEF += item.itemMagicDEFBoost;
+                    Debug.Log($"Equipped {item.itemName}. Player stats updated.");
+    
+                    if (item.equipmentType == weapon)
                     {
-                        player.EquipItem("Weapon", item);
-                        equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Weapon", item.itemIcon);
-
+                        if (item.equipSlotNeeded == oneHanded)
+                        {
+                            player[playerIndex].EquipItemUI("Weapon", item);
+                        }
+                        else if (item.equipSlotNeeded == twoHanded)
+                        {
+                            player[playerIndex].EquipItemUI("Weapon", item);
+                            player[playerIndex].EquipItemUI("Shield", item);
+                        }
                     }
-                    else if (item.equipSlotNeeded == twoHanded)
+                    else if (item.equipmentType == shield)
                     {
-                        player.EquipItem("Weapon", item);
-                        equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Weapon", item.itemIcon);
-                        player.EquipItem("Shield", item);
-                        equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Shield", item.itemIcon);
+                        player[playerIndex].EquipItemUI("Shield", item);
                     }
+                    else if (item.equipmentType == head)
+                    {
+                        player[playerIndex].EquipItemUI("Head", item);
+                    }
+                    else if (item.equipmentType == chest)
+                    {
+                        player[playerIndex].EquipItemUI("Chest", item);
+                    }
+                    else if (item.equipmentType == arms)
+                    {
+                        player[playerIndex].EquipItemUI("Arms", item);
+                    }
+                    else if (item.equipmentType == legs)
+                    {
+                        player[playerIndex].EquipItemUI("Legs", item);
+                    }
+    
+                    RemoveItem(itemIndex);
+                    MenuManager.instance.ClearInventoryUI();
+    
+                    return;
                 }
-                else if (item.equipmentType == shield)
-                {
-                    player.EquipItem("Shield", item);
-                    equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Shield", item.itemIcon);
-                }
-                else if (item.equipmentType == head)
-                {
-                    player.EquipItem("Head", item);
-                    equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Head", item.itemIcon);
-                }
-                else if (item.equipmentType == chest)
-                {
-                    player.EquipItem("Chest", item);
-                    equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Chest", item.itemIcon);
-                }
-                else if (item.equipmentType == arms)
-                {
-                    player.EquipItem("Arms", item);
-                    equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Arms", item.itemIcon);
-                }
-                else if (item.equipmentType == legs)
-                {
-                    player.EquipItem("Legs", item);
-                    equipmentUI.SetEquipmentUIElements(setOrRemove: "Set", slot: "Legs", item.itemIcon);
-                }
-
-
-                return;
             }
         }
     }

@@ -1,0 +1,5 @@
+To do list for Sachen die I am working on or want to do next.
+
+Set up the ChooseCharPanel:
+    - Complete "EquipOrUse()" method to be able to unequip items from the equipment inventory
+    
