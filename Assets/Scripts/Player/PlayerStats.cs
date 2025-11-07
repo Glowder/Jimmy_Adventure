@@ -1,11 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
   public static PlayerStats instance;
-  private Dictionary<string, ItemManager> playerEquipment = new Dictionary<string, ItemManager>(6);
+  public Dictionary<string, ItemManager> playerEquipment = new Dictionary<string, ItemManager>(6);
   public readonly int maxEquipmentSlots = 6;
+  // private int characterIndex = 0;
   [SerializeField] Sprite playerPortrait;
   [SerializeField] string playerName, playerClass;
   [SerializeField]
@@ -29,6 +32,10 @@ public class PlayerStats : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    if (Input.GetKeyDown(KeyCode.I))
+    {
+      // AddListenerForButtons();
+    }
     PlayerLevelingManagement();
   }
 
@@ -48,7 +55,7 @@ public class PlayerStats : MonoBehaviour
     playerEquipment.Add("Shield", null);
   }
 
-  public void EquipItemUI(string slot, ItemManager item)
+  public void PlayerEquipItem(string slot, ItemManager item)
   {
     if (playerEquipment.ContainsKey(slot))
     {
@@ -69,6 +76,55 @@ public class PlayerStats : MonoBehaviour
     else
     {
       Debug.LogWarning($"Slot {slot} does not exist in player equipment.");
+    }
+  }
+
+  public void PlayerUnequipItem(string slot)
+  {
+    Debug.Log("Step one: Entered.");
+    if (ItemMenuManager.instance != null && instance != null && MenuManager.instance != null)
+    {
+      Debug.Log("Step two: Inside.");
+      MenuManager menuManager = MenuManager.instance;
+      int characterIndex = menuManager.SelectedCharacterIndex;
+      GameManager gameManager = GameManager.instance;
+      ItemManager itemToInstantiate = gameManager.GetSortedPlayerStats()[characterIndex]?.playerEquipment[slot] ?? null;
+      PlayerStats player_To_Unequip = gameManager.GetSortedPlayerStats()[characterIndex];
+      // PlayerStats[] player_To_Unequip = gameManager.GetSortedPlayerStats();
+      Debug.Log("PlayerStats => PlayerUnequipItem ==> Character index is: " + characterIndex + " and player name is: " + player_To_Unequip.playerName);
+      if (itemToInstantiate == null)
+      {
+        Debug.LogWarning($"No item equipped at slot {slot} to unequip.");
+        return;
+      }
+      ItemManager item = Instantiate(itemToInstantiate);
+      Inventory inventory = Inventory.instance;
+
+      player_To_Unequip.maxHP -= item.itemHPBoost;
+      player_To_Unequip.currentHP = (player_To_Unequip.currentHP > player_To_Unequip.maxHP) ? player_To_Unequip.maxHP : player_To_Unequip.currentHP;
+
+      player_To_Unequip.maxMP -= item.itemMPBoost;
+      player_To_Unequip.currentMP = (player_To_Unequip.currentMP > player_To_Unequip.maxMP) ? player_To_Unequip.maxMP : player_To_Unequip.currentMP;
+
+      player_To_Unequip.strength -= item.itemStrengthBoost;
+      player_To_Unequip.intelligence -= item.itemIntelligenceBoost;
+      player_To_Unequip.crit -= item.itemCritBoost;
+      player_To_Unequip.physicalDEF -= item.itemPhysicalDEFBoost;
+      player_To_Unequip.magicDEF -= item.itemMagicDEFBoost;
+
+      inventory.AddItem(item);
+      if (item.equipSlotNeeded == ItemManager.EquipSlotNeeded.TwoHanded)
+      {
+        player_To_Unequip.playerEquipment["Weapon"] = null;
+        player_To_Unequip.playerEquipment["Shield"] = null;
+      }
+      else
+      {
+        player_To_Unequip.playerEquipment[slot] = null;
+      }
+
+      player_To_Unequip.SetDetailedStatsValues();
+
     }
   }
 
@@ -121,11 +177,15 @@ public class PlayerStats : MonoBehaviour
     }
   }
 
+  /* NOTE: This method gets called whenever the player clicks on the button "Detailed Stats"
+  with the GameObject of the character, whose stats are being viewed, attached to it */
   public void SetDetailedStatsValues()
   {
-    if (MenuManager.instance != null && instance != null && ItemMenuManager.instance != null)
+    if (MenuManager.instance != null && instance != null && ItemMenuManager.instance != null && GameManager.instance != null)
     {
       MenuManager stats = MenuManager.instance;
+      stats.SelectedCharacterIndex = groupPositionNumber;
+      Debug.Log("PlayerStats => SetDetailedStatsValues ==> Selected Character Index is: " + stats.SelectedCharacterIndex);
       ItemMenuManager equipmentInventory = ItemMenuManager.instance;
       string[] equipmentSlots = new string[6] { "Head", "Chest", "Arms", "Legs", "Weapon", "Shield" };
       string set = "Set";
@@ -150,7 +210,7 @@ public class PlayerStats : MonoBehaviour
       stats.DSPhysicalEvasion.text = "Physical Evasion: \n" + physicalEvasion + "%";
       stats.DSMagicEvasion.text = "Magical Evasion: \n" + magicEvasion + "%";
 
-      for (int i=0; i < playerEquipment.Count; i++)
+      for (int i = 0; i < playerEquipment.Count; i++)
       {
         string slot = equipmentSlots[i];
         if (playerEquipment[slot] != null)
@@ -234,10 +294,7 @@ public class PlayerStats : MonoBehaviour
     get => dexterity;
     set => dexterity = value;
   }
-  public int GroupPositionNumber
-  {
-    get => groupPositionNumber;
-  }
+
   public string PlayerClass
   {
     get => playerClass;
@@ -276,16 +333,26 @@ public class PlayerStats : MonoBehaviour
   {
     get => maxLevel;
   }
+  public int PhysicalEvasion
+  {
+    get => physicalEvasion;
+    set => physicalEvasion = value;
+  }
+
+  public int MagicalEvasion
+  {
+    get => magicEvasion;
+    set => magicEvasion = value;
+  }
   public int GetMaxXP()
   {
-    // Safety checks
     if (currentLevel < 1)
       currentLevel = 1;
 
     if (requiredXPForEachLevel == null || requiredXPForEachLevel.Count == 0)
     {
       Debug.LogWarning("requiredXPForEachLevel list is empty or null!");
-      return maxXP = 100; // Return a default value
+      return maxXP = 100;
     }
 
     // Ensure we don't go out of bounds and use 0-based indexing
@@ -309,17 +376,6 @@ public class PlayerStats : MonoBehaviour
     }
   }
 
-  public int PhysicalEvasion
-  {
-    get => physicalEvasion;
-    set => physicalEvasion = value;
-  }
-
-  public int MagicalEvasion
-  {
-    get => magicEvasion;
-    set => magicEvasion = value;
-  }
   #endregion
 
 }

@@ -12,7 +12,7 @@ public class MenuManager : MonoBehaviour
 {
   public static MenuManager instance;
 
-  private int selectedItemIndex;
+  private int selectedItemIndex, selectedCharacterIndex;
   [SerializeField] UnityEngine.UI.Button equipOrUseButton;
   [SerializeField] UnityEngine.UI.Button discardButton;
   [SerializeField] UnityEngine.UI.Button firstItemButton;
@@ -53,15 +53,20 @@ public class MenuManager : MonoBehaviour
   // Start is called once before the first execution of Update after the MonoBehaviour is created
   void Start()
   {
-    CreateInstance();
+    // CreateInstance();
     AddListenerToButtons();
 
     image.enabled = true;
     image = GetComponentInChildren<UnityEngine.UI.Image>();
   }
 
-  // Update is called once per frame
-  void Update()
+    private void Awake()
+    {
+        CreateInstance();
+    }
+
+    // Update is called once per frame
+    void Update()
   {
 
     if (Input.GetKeyDown(KeyCode.U))
@@ -143,7 +148,7 @@ public class MenuManager : MonoBehaviour
       if (playerStats[i] != null)
       {
         // Get the group position (0-based for direct array indexing)
-        int slotIndex = playerStats[i].GroupPositionNumber;
+        int slotIndex = playerStats[i].PlayerGroupPositionNumber;
 
         // Make sure the slot index is valid
         if (slotIndex >= 0 && slotIndex < characterSlots.Length && characterSlots[slotIndex] != null)
@@ -175,7 +180,7 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-          Debug.LogWarning($"Player {playerStats[i].PlayerName} has invalid groupPositionNumber: {playerStats[i].GroupPositionNumber}");
+          Debug.LogWarning($"Player {playerStats[i].PlayerName} has invalid groupPositionNumber: {playerStats[i].PlayerGroupPositionNumber}");
         }
       }
     }
@@ -245,7 +250,7 @@ public class MenuManager : MonoBehaviour
     image.GetComponent<Animator>().SetTrigger("Start Fade");
   }
 
-  private void CreateInstance()
+  public void CreateInstance()
   {
     if (instance != null && instance != this)
     {
@@ -269,7 +274,7 @@ public class MenuManager : MonoBehaviour
   }
 
   // FIND: EquipOrUse
-  public void EquipOrUse(int playerIndex, string equipOrRemove)
+  public void EquipOrUse(int playerIndex)
   {
     if (Inventory.instance != null && instance != null && ItemMenuManager.instance != null)
     {
@@ -287,7 +292,7 @@ public class MenuManager : MonoBehaviour
         }
         else if (item.itemType == equipment)
         {
-          inventory.EquipItemLogic(itemIndex: itemIndex, playerIndex: playerIndex, equipOrRemove: equipOrRemove);
+          inventory.EquipItemLogic(itemIndex: itemIndex, playerIndex: playerIndex);
         }
       }
     }
@@ -328,6 +333,13 @@ public class MenuManager : MonoBehaviour
 
   #region Getter and Setter
 
+  public GameObject MenuCanvas => menuCanvas;
+
+public int SelectedCharacterIndex
+{
+  get => selectedCharacterIndex;
+  set => selectedCharacterIndex = value;
+}
   public bool MenuCanvasActive => menuCanvas.activeInHierarchy;
 
   public Sprite ItemFrame => inventoryItemFrame;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 public class ItemMenuManager : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class ItemMenuManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI itemCountMisc, itemNameMisc, itemDescriptionMisc;
     [SerializeField] public GameObject equipmentHead, equipmentChest, equipmentArms, equipmentLegs, equipmentWeapon, equipmentShield;
     [SerializeField] public Dictionary<string, GameObject> equipmentUI = new Dictionary<string, GameObject>();
+    [SerializeField] public UnityEngine.UI.Button[] unequipButtons = new UnityEngine.UI.Button[6];
+    [SerializeField] public UnityEngine.UI.Button[] unequipButtons2 = new UnityEngine.UI.Button[6];
     [SerializeField] GameObject choosingAmount, amountPanel, chooseCharPanel;
     // private int changedAmount;
     [SerializeField] TMP_InputField choosingAmountText;
@@ -21,32 +24,220 @@ public class ItemMenuManager : MonoBehaviour
     [SerializeField] UnityEngine.UI.Button reduceAmountButton, increaseAmountButton, confirmAmountButton, cancelAmountButton;
     [SerializeField] UnityEngine.UI.Button[] chooseCharButtons = new UnityEngine.UI.Button[6];
 
-    private bool chooseCharPanelUpdate = false;
+    private Dictionary<int, bool> initCheck = new Dictionary<int, bool>();
+
+    private bool chooseCharPanelUpdate = false, allreadySet = false;
 
     // FIXME: Start
     void Start()
     {
-        CreateInstance();
-        AmountPanelButtonFunctions();
-        EquipmentUIElements();
-        ChooseCharPanelSetup();
+        AmountPanelButtonFunctions(); //NOTE: initCheck.Key = 2
+        ChooseCharPanelSetup(); //NOTE: initCheck.Key = 3
         choosingAmountText.text = "0";
+        // AddArrayElementsDynamically(); //NOTE: initCheck.Key = 4
+        AddListenerForButtons(); //NOTE: initCheck.Key = 5
     }
 
     // FIXME: Update
     void Update()
     {
-        ChooseCharPanelSetup();
+        MethodInitializationLogic();
     }
 
-    private void EquipmentUIElements()
+    private void Awake()
     {
+        CreateInstance(); //NOTE: initCheck.Key = 0
+        EquipmentUIElements();  // NOTE: initCheck.Key = 1; Setting Key-Value pairs for equipment UI elements
+    }
+
+    // FIND: InitCheckDictionary
+    private void InitCheckDictionary(int key, bool value, string set_Or_Change)
+    {
+        if (set_Or_Change.Equals("set", StringComparison.OrdinalIgnoreCase) && value == true)
+        {
+            Debug.LogError($"InitCheckDictionary ==> only false is allowed if you want to set.");
+            Debug.LogError($"The value true is only allowed for change.");
+            return;
+        }
+        // NOTE: just needs to set a key and its value. The order is not importnant and waht the key is does not matter
+        if (set_Or_Change.Equals("set", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!initCheck.ContainsKey(key))
+            {
+                initCheck.Add(key, value);
+            }
+            else
+            {
+                initCheck.Add(initCheck.Count, value);
+            }
+        }
+        else if (set_Or_Change.Equals("change", StringComparison.OrdinalIgnoreCase))
+        {
+            if (initCheck.ContainsKey(key))
+            {
+                initCheck[key] = value;
+            }
+            else
+            {
+                Debug.LogError($"InitCheckDictionary ==> key {key} does not exist.");
+            }
+        }
+        return;
+    }
+
+    private void MethodInitializationLogic() //NOTE: Calls various initialization methods if they haven't been called yet for some reason
+    {
+        if (allreadySet) return;
+        int keyToCheck = -1;
+        int[] dictKeys = initCheck.Keys.ToArray();
+        if (!allreadySet)
+        {
+            for (int i = 0; i < dictKeys.Length; i++)
+            {
+                if (initCheck[dictKeys[i]] == false)
+                {
+                    keyToCheck = dictKeys[i];
+                    break;
+                }
+            }
+            if (keyToCheck == -1)
+            {
+                allreadySet = true;
+            }
+        }
+        switch (keyToCheck)
+        {
+            case 0:
+                CreateInstance();
+                break;
+            case 1:
+                EquipmentUIElements();
+                break;
+            case 2:
+                AmountPanelButtonFunctions();
+                break;
+            case 3:
+                ChooseCharPanelSetup();
+                break;
+            case 4:
+                // AddArrayElementsDynamically();
+                break;
+            case 5:
+                AddListenerForButtons();
+                break;
+            default:
+                Debug.LogError("MethodInitializationLogic ==> No matching key found.");
+                break;
+        }
+    }
+
+    // private void AddArrayElementsDynamically()  //initCheck.Key = 4; This method can be used to dynamically populate arrays for any UI elements if needed
+    // {
+    //     if (!initCheck.ContainsKey(4))
+    //         InitCheckDictionary(key: 4, value: false, set_Or_Change: "set");
+
+    //     // string panelName = "Panel - ";
+    //     string buttonName = "Button - ";
+
+    //     if (instance == null)
+    //     {
+    //         Debug.LogError("ItemMenuManager => AddArrayElementsDynamically ==> instance is null!");
+    //         return;
+    //     }
+    //     if (MenuManager.instance == null)
+    //     {
+    //         Debug.LogError("ItemMenuManager => AddArrayElementsDynamically ==> MenuManager.instance is null!");
+    //         return;
+    //     }
+
+    //     if (instance != null && MenuManager.instance != null)
+    //     {
+    //         GameObject canvasObject = MenuManager.instance.MenuCanvas;
+    //         List<UnityEngine.UI.Button> tempButton = new List<UnityEngine.UI.Button>();
+    //         tempButton.AddRange(canvasObject.GetComponentsInChildren<UnityEngine.UI.Button>(true));
+    //         Debug.Log($"======> Total buttons found in canvas: {tempButton.Count} <======");
+    //         // if (unequipButtons2.Length < 0) return;
+    //         int slotIndex = 0;
+    //         string[] slots = equipmentUI.Keys.ToArray();
+    //         UnityEngine.UI.Button[] neededButtons = new UnityEngine.UI.Button[slots.Length];
+    //         for (int i = 0; i < neededButtons.Length; i++)
+    //         {
+    //             neededButtons[i] = null;
+    //             Debug.Log($"neededButtons at index {i} set to null.");
+    //         }
+    //         for (int i = 0; i < tempButton.Count; i++)
+    //         {
+    //             Debug.Log("slotIndex is: " + slotIndex);
+    //             if (slotIndex == slots.Length)
+    //             {
+    //                 Debug.Log($"slotIndex is {slotIndex} and slots.Length is {slots.Length}, breaking loop.");
+    //                 break;
+    //             }
+
+    //             if (tempButton[i].name == buttonName + slots[slotIndex])
+    //             {
+    //                 Debug.Log($"slot value is {slots[i]}");
+    //                 // Debug.Log($"ItemMenuManager => AddArrayElementsDynamically ==> Found button: {buttonName + slots[slotIndex]}");
+    //                 neededButtons[slotIndex] = tempButton[i];
+    //                 slotIndex++;
+    //             }
+    //         }
+    //         for (int i = 0; i < slots.Length; i++)
+    //         {
+    //             Debug.Log($"Buttons name is =========> {neededButtons[i]?.name ?? "null"} <=========");
+    //             // Debug.Log($"ItemMenuManager => AddArrayElementsDynamically ==> Finding button: {buttonName + slots[i]}");
+    //             // unequipButtons2[i] = neededButtons[i];
+    //         }
+    //         InitCheckDictionary(key: 4, value: true, set_Or_Change: "change");
+    //         return;
+    //     }
+    // }
+
+    public void AddListenerForButtons() //NOTE: initCheck.Key = 5
+    {
+        InitCheckDictionary(key: 5, value: false, set_Or_Change: "set");
+        if (instance != null)
+        {
+            string[] equipmentSlots = new string[] { "Weapon", "Head", "Shield", "Arms", "Chest", "Legs" };
+            // NOTE: Gets the Keys and gives it to "slot" variable
+            for (int i = 0; i < equipmentSlots.Length; i++)
+            {
+                if (unequipButtons != null && i < unequipButtons.Length && unequipButtons[i] != null)
+                {
+                    unequipButtons[i].onClick.RemoveAllListeners();
+                }
+                else
+                {
+                    Debug.LogWarning($"unequipButtons[{i}] is null or array is too short!");
+                }
+            }
+
+            for (int i = 0; i < equipmentSlots.Length; i++)
+            {
+                if (unequipButtons != null && i < unequipButtons.Length && unequipButtons[i] != null)
+                {
+                    string slot = equipmentSlots[i];
+                    unequipButtons[i].onClick.AddListener(() => PlayerStats.instance.PlayerUnequipItem(slot));
+                }
+                else
+                {
+                    Debug.LogWarning($"unequipButtons[{i}] is null or array is too short!");
+                }
+            }
+        }
+        InitCheckDictionary(key: 5, value: true, set_Or_Change: "change");
+        return;
+    }
+    private void EquipmentUIElements() //NOTE: initCheck.Key = 1
+    {
+        InitCheckDictionary(key: 1, value: false, set_Or_Change: "set");
         equipmentUI.Add("Head", equipmentHead);
         equipmentUI.Add("Chest", equipmentChest);
         equipmentUI.Add("Arms", equipmentArms);
         equipmentUI.Add("Legs", equipmentLegs);
         equipmentUI.Add("Weapon", equipmentWeapon);
         equipmentUI.Add("Shield", equipmentShield);
+        InitCheckDictionary(key: 1, value: true, set_Or_Change: "change");
     }
 
     public void SetEquipmentUIElements(string setOrRemove, string slot, Sprite sprite)
@@ -75,12 +266,14 @@ public class ItemMenuManager : MonoBehaviour
         }
     }
 
-    private void AmountPanelButtonFunctions()
+    private void AmountPanelButtonFunctions() //NOTE: initCheck.Key = 2
     {
+        InitCheckDictionary(key: 2, value: false, set_Or_Change: "set");
         reduceAmountButton.onClick.AddListener(() => ChangeItemAmount(change: "decrease"));
         increaseAmountButton.onClick.AddListener(() => ChangeItemAmount(change: "increase"));
         confirmAmountButton.onClick.AddListener(() => ConfirmCancelItemAmount("confirm"));
         cancelAmountButton.onClick.AddListener(() => ConfirmCancelItemAmount("cancel"));
+        InitCheckDictionary(key: 2, value: true, set_Or_Change: "change");
     }
     public void ChangeItemAmount(string change)
     {
@@ -144,8 +337,10 @@ public class ItemMenuManager : MonoBehaviour
         }
     }
 
-    public void ChooseCharPanelSetup()
+    public void ChooseCharPanelSetup() //NOTE: initCheck.Key = 3
     {
+        InitCheckDictionary(key: 3, value: false, set_Or_Change: "set");
+
         if (GameManager.instance != null && PlayerStats.instance != null && MenuManager.instance != null)
         {
             // Check if the character selection panel is active and not yet updated
@@ -173,6 +368,7 @@ public class ItemMenuManager : MonoBehaviour
                     }
                 }
                 chooseCharPanelUpdate = true;
+                InitCheckDictionary(key: 3, value: true, set_Or_Change: "change");
             }
             else if (MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && !chooseCharPanelUpdate)
             {
@@ -187,13 +383,15 @@ public class ItemMenuManager : MonoBehaviour
         }
     }
 
-    private void CreateInstance()
+    private void CreateInstance() //NOTE: initCheck.Key = 0
     {
+        InitCheckDictionary(key: 0, value: false, set_Or_Change: "set");
         if (instance == null)
         {
             instance = this;
         }
         DontDestroyOnLoad(gameObject);
+        InitCheckDictionary(key: 0, value: true, set_Or_Change: "change");
     }
 
     #region "Getters and Setters"

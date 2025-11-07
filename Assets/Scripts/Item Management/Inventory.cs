@@ -29,20 +29,21 @@ public class Inventory : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            PlayerStats[] playerStats = MenuManager.instance.playerStats;
-            // ShowInventoryContents();
-            for (int i = 0; i < playerStats.Length; i++)
-            {
-                Debug.Log($"{playerStats[i].PlayerName} ==> Head: {playerStats[i].GetEquipmentAtSlot("Head")?.itemName ?? "None"}");
-                Debug.Log($"{playerStats[i].PlayerName} ==> Chest: {playerStats[i].GetEquipmentAtSlot("Chest")?.itemName ?? "None"}");
-                Debug.Log($"{playerStats[i].PlayerName} ==> Arms: {playerStats[i].GetEquipmentAtSlot("Arms")?.itemName ?? "None"}");
-                Debug.Log($"{playerStats[i].PlayerName} ==> Legs: {playerStats[i].GetEquipmentAtSlot("Legs")?.itemName ?? "None"}");
-                Debug.Log($"{playerStats[i].PlayerName} ==> Weapon: {playerStats[i].GetEquipmentAtSlot("Weapon")?.itemName ?? "None"}");
-                Debug.Log($"{playerStats[i].PlayerName} ==> Shield: {playerStats[i].GetEquipmentAtSlot("Shield")?.itemName ?? "None"}");
-            }
-        }
+        // if (Input.GetKeyDown(KeyCode.I))
+        // {
+        //     PlayerStats[] playerStats = MenuManager.instance.playerStats;
+        //     // ShowInventoryContents();
+        //     for (int i = 0; i < playerStats.Length; i++)
+        //     {
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Head: {playerStats[i].GetEquipmentAtSlot("Head")?.itemName ?? "None"}");
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Chest: {playerStats[i].GetEquipmentAtSlot("Chest")?.itemName ?? "None"}");
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Arms: {playerStats[i].GetEquipmentAtSlot("Arms")?.itemName ?? "None"}");
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Legs: {playerStats[i].GetEquipmentAtSlot("Legs")?.itemName ?? "None"}");
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Weapon: {playerStats[i].GetEquipmentAtSlot("Weapon")?.itemName ?? "None"}");
+        //         Debug.Log($"{playerStats[i].PlayerName} ==> Shield: {playerStats[i].GetEquipmentAtSlot("Shield")?.itemName ?? "None"}");
+        //         Debug.Log("< ============================================================== >");
+        //     }
+        // }
     }
 
     private void ShowInventoryContents()
@@ -202,15 +203,6 @@ public class Inventory : MonoBehaviour
         MenuManager.instance.UpdateInventoryUI(inventorySlotIndex: inventorySlot, stackSize: stackSize);
     }
 
-    private int GetItemCount()
-    {
-        int count = 0;
-        foreach (var item in items)
-        {
-            if (item != null) count++;
-        }
-        return count;
-    }
     public int GetFreeSlotCount()
     {
         int count = 0;
@@ -517,7 +509,7 @@ public class Inventory : MonoBehaviour
     }
 
     // FIND: EquipItem
-    public void EquipItemLogic(int itemIndex, int playerIndex, string equipOrRemove)
+    public void EquipItemLogic(int itemIndex, int playerIndex)
     {
         #region "Initial Definitions"
         ItemManager item = GetItemDetails(itemIndex);
@@ -556,61 +548,58 @@ public class Inventory : MonoBehaviour
 
         if (item != null && player != null && playerIndex >= 0 && playerIndex < player.Length)
         {
-
-            if (equipOrRemove.Equals("Equip", StringComparison.OrdinalIgnoreCase))
+            if (item.CurrentStackSize > 0 && item.itemType == equipment)
             {
-                if (item.CurrentStackSize > 0 && item.itemType == equipment)
+                // Note: Equip logic goes here
+                player[playerIndex].MaxHealth += item.itemHPBoost;
+                player[playerIndex].MaxMana += item.itemMPBoost;
+                player[playerIndex].Strength += item.itemStrengthBoost;
+                player[playerIndex].CritChance += item.itemCritBoost;
+                player[playerIndex].PhysicalDEF += item.itemPhysicalDEFBoost;
+                player[playerIndex].Intelligence += item.itemIntelligenceBoost;
+                player[playerIndex].MagicalDEF += item.itemMagicDEFBoost;
+                Debug.Log($"Equipped {item.itemName}. Player stats updated.");
+
+                if (item.equipmentType == weapon)
                 {
-                    // Note: Equip logic goes here
-                    player[playerIndex].MaxHealth += item.itemHPBoost;
-                    player[playerIndex].MaxMana += item.itemMPBoost;
-                    player[playerIndex].Strength += item.itemStrengthBoost;
-                    player[playerIndex].CritChance += item.itemCritBoost;
-                    player[playerIndex].PhysicalDEF += item.itemPhysicalDEFBoost;
-                    player[playerIndex].Intelligence += item.itemIntelligenceBoost;
-                    player[playerIndex].MagicalDEF += item.itemMagicDEFBoost;
-                    Debug.Log($"Equipped {item.itemName}. Player stats updated.");
-    
-                    if (item.equipmentType == weapon)
+                    if (item.equipSlotNeeded == oneHanded)
                     {
-                        if (item.equipSlotNeeded == oneHanded)
-                        {
-                            player[playerIndex].EquipItemUI("Weapon", item);
-                        }
-                        else if (item.equipSlotNeeded == twoHanded)
-                        {
-                            player[playerIndex].EquipItemUI("Weapon", item);
-                            player[playerIndex].EquipItemUI("Shield", item);
-                        }
+                        player[playerIndex].PlayerEquipItem("Weapon", item);
                     }
-                    else if (item.equipmentType == shield)
+                    else if (item.equipSlotNeeded == twoHanded)
                     {
-                        player[playerIndex].EquipItemUI("Shield", item);
+                        player[playerIndex].PlayerEquipItem("Weapon", item);
+                        player[playerIndex].PlayerEquipItem("Shield", item);
                     }
-                    else if (item.equipmentType == head)
-                    {
-                        player[playerIndex].EquipItemUI("Head", item);
-                    }
-                    else if (item.equipmentType == chest)
-                    {
-                        player[playerIndex].EquipItemUI("Chest", item);
-                    }
-                    else if (item.equipmentType == arms)
-                    {
-                        player[playerIndex].EquipItemUI("Arms", item);
-                    }
-                    else if (item.equipmentType == legs)
-                    {
-                        player[playerIndex].EquipItemUI("Legs", item);
-                    }
-    
-                    RemoveItem(itemIndex);
-                    MenuManager.instance.ClearInventoryUI();
-    
-                    return;
                 }
+                else if (item.equipmentType == shield)
+                {
+                    player[playerIndex].PlayerEquipItem("Shield", item);
+                }
+                else if (item.equipmentType == head)
+                {
+                    player[playerIndex].PlayerEquipItem("Head", item);
+                }
+                else if (item.equipmentType == chest)
+                {
+                    player[playerIndex].PlayerEquipItem("Chest", item);
+                }
+                else if (item.equipmentType == arms)
+                {
+                    player[playerIndex].PlayerEquipItem("Arms", item);
+                }
+                else if (item.equipmentType == legs)
+                {
+                    player[playerIndex].PlayerEquipItem("Legs", item);
+                }
+
+                RemoveItem(itemIndex);
+                MenuManager.instance.ClearInventoryUI();
+
+                return;
             }
         }
     }
+
     public int GetInventoryItemCount => items.Count;
 }

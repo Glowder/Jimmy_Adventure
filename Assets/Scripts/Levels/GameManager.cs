@@ -34,9 +34,14 @@ public class GameManager : MonoBehaviour
     // NOTE: Return sorted PlayerStats array
     PlayerStats[] tempStats = new PlayerStats[playerStats.Length];
     for (int i = 0; i < playerStats.Length; i++)
-        {
-            tempStats[playerStats[i].PlayerGroupPositionNumber] = playerStats[i];
-        }
+    {
+      tempStats[playerStats[i].PlayerGroupPositionNumber] = playerStats[i];
+    }
     return tempStats;
+  }
+  
+  public PlayerStats ManualPlayerReturnForButtons(int index)
+  {
+    return GetSortedPlayerStats()[index];
   }
 }
