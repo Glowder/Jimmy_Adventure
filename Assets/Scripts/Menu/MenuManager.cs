@@ -60,13 +60,13 @@ public class MenuManager : MonoBehaviour
     image = GetComponentInChildren<UnityEngine.UI.Image>();
   }
 
-    private void Awake()
-    {
-        CreateInstance();
-    }
+  private void Awake()
+  {
+    CreateInstance();
+  }
 
-    // Update is called once per frame
-    void Update()
+  // Update is called once per frame
+  void Update()
   {
 
     if (Input.GetKeyDown(KeyCode.U))
@@ -247,7 +247,8 @@ public class MenuManager : MonoBehaviour
 
   public void FadeImage()
   {
-    image.GetComponent<Animator>().SetTrigger("Start Fade");
+    if (image == null)
+      image.GetComponent<Animator>().SetTrigger("Start Fade");
   }
 
   public void CreateInstance()
@@ -335,11 +336,11 @@ public class MenuManager : MonoBehaviour
 
   public GameObject MenuCanvas => menuCanvas;
 
-public int SelectedCharacterIndex
-{
-  get => selectedCharacterIndex;
-  set => selectedCharacterIndex = value;
-}
+  public int SelectedCharacterIndex
+  {
+    get => selectedCharacterIndex;
+    set => selectedCharacterIndex = value;
+  }
   public bool MenuCanvasActive => menuCanvas.activeInHierarchy;
 
   public Sprite ItemFrame => inventoryItemFrame;

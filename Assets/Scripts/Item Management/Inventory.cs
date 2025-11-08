@@ -22,8 +22,6 @@ public class Inventory : MonoBehaviour
     void Start()
     {
         instance = this;
-        //TEMP: this line is just temporary for testing
-        //  Debug.Log($"Inventory instance is {instance.enabled} and {items.Length} Items were created.");
     }
 
     // Update is called once per frame
@@ -31,18 +29,7 @@ public class Inventory : MonoBehaviour
     {
         // if (Input.GetKeyDown(KeyCode.I))
         // {
-        //     PlayerStats[] playerStats = MenuManager.instance.playerStats;
-        //     // ShowInventoryContents();
-        //     for (int i = 0; i < playerStats.Length; i++)
-        //     {
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Head: {playerStats[i].GetEquipmentAtSlot("Head")?.itemName ?? "None"}");
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Chest: {playerStats[i].GetEquipmentAtSlot("Chest")?.itemName ?? "None"}");
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Arms: {playerStats[i].GetEquipmentAtSlot("Arms")?.itemName ?? "None"}");
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Legs: {playerStats[i].GetEquipmentAtSlot("Legs")?.itemName ?? "None"}");
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Weapon: {playerStats[i].GetEquipmentAtSlot("Weapon")?.itemName ?? "None"}");
-        //         Debug.Log($"{playerStats[i].PlayerName} ==> Shield: {playerStats[i].GetEquipmentAtSlot("Shield")?.itemName ?? "None"}");
-        //         Debug.Log("< ============================================================== >");
-        //     }
+        //     ShowInventoryContents();
         // }
     }
 
@@ -530,22 +517,6 @@ public class Inventory : MonoBehaviour
         PlayerStats[] player = GameManager.instance.GetSortedPlayerStats();
         #endregion
 
-        if (item == null)
-        {
-            Debug.LogError("EquipItem aborted: item is null.");
-            return;
-        }
-        if (equipmentUI == null)
-        {
-            Debug.LogError("EquipItem aborted: equipmentUI is null.");
-            return;
-        }
-        if (player == null)
-        {
-            Debug.LogError("EquipItem aborted: player array is null.");
-            return;
-        }
-
         if (item != null && player != null && playerIndex >= 0 && playerIndex < player.Length)
         {
             if (item.CurrentStackSize > 0 && item.itemType == equipment)
@@ -558,7 +529,6 @@ public class Inventory : MonoBehaviour
                 player[playerIndex].PhysicalDEF += item.itemPhysicalDEFBoost;
                 player[playerIndex].Intelligence += item.itemIntelligenceBoost;
                 player[playerIndex].MagicalDEF += item.itemMagicDEFBoost;
-                Debug.Log($"Equipped {item.itemName}. Player stats updated.");
 
                 if (item.equipmentType == weapon)
                 {

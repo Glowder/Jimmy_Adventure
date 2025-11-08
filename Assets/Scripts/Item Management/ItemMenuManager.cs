@@ -16,7 +16,6 @@ public class ItemMenuManager : MonoBehaviour
     [SerializeField] public GameObject equipmentHead, equipmentChest, equipmentArms, equipmentLegs, equipmentWeapon, equipmentShield;
     [SerializeField] public Dictionary<string, GameObject> equipmentUI = new Dictionary<string, GameObject>();
     [SerializeField] public UnityEngine.UI.Button[] unequipButtons = new UnityEngine.UI.Button[6];
-    [SerializeField] public UnityEngine.UI.Button[] unequipButtons2 = new UnityEngine.UI.Button[6];
     [SerializeField] GameObject choosingAmount, amountPanel, chooseCharPanel;
     // private int changedAmount;
     [SerializeField] TMP_InputField choosingAmountText;
@@ -26,7 +25,7 @@ public class ItemMenuManager : MonoBehaviour
 
     private Dictionary<int, bool> initCheck = new Dictionary<int, bool>();
 
-    private bool chooseCharPanelUpdate = false, allreadySet = false;
+    private bool chooseCharPanelUpdate = false, allreadySet = false, mainMenuInitialized = false;
 
     // FIXME: Start
     void Start()
@@ -68,7 +67,7 @@ public class ItemMenuManager : MonoBehaviour
             }
             else
             {
-                initCheck.Add(initCheck.Count, value);
+                Debug.LogError($"InitCheckDictionary ==> key {key} already exists.");
             }
         }
         else if (set_Or_Change.Equals("change", StringComparison.OrdinalIgnoreCase))
@@ -87,6 +86,15 @@ public class ItemMenuManager : MonoBehaviour
 
     private void MethodInitializationLogic() //NOTE: Calls various initialization methods if they haven't been called yet for some reason
     {
+        if(MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && mainMenuInitialized)
+        {
+            mainMenuInitialized = false;
+        }
+        if(MenuManager.instance != null && MenuManager.instance.MenuCanvasActive && !mainMenuInitialized)
+        {
+            ChooseCharPanelSetup(); //NOTE: initCheck.Key = 3
+            mainMenuInitialized = true;
+        }
         if (allreadySet) return;
         int keyToCheck = -1;
         int[] dictKeys = initCheck.Keys.ToArray();
@@ -117,12 +125,6 @@ public class ItemMenuManager : MonoBehaviour
                 AmountPanelButtonFunctions();
                 break;
             case 3:
-                ChooseCharPanelSetup();
-                break;
-            case 4:
-                // AddArrayElementsDynamically();
-                break;
-            case 5:
                 AddListenerForButtons();
                 break;
             default:
@@ -195,7 +197,7 @@ public class ItemMenuManager : MonoBehaviour
 
     public void AddListenerForButtons() //NOTE: initCheck.Key = 5
     {
-        InitCheckDictionary(key: 5, value: false, set_Or_Change: "set");
+        InitCheckDictionary(key: 3, value: false, set_Or_Change: "set");
         if (instance != null)
         {
             string[] equipmentSlots = new string[] { "Weapon", "Head", "Shield", "Arms", "Chest", "Legs" };
@@ -224,8 +226,8 @@ public class ItemMenuManager : MonoBehaviour
                     Debug.LogWarning($"unequipButtons[{i}] is null or array is too short!");
                 }
             }
+            InitCheckDictionary(key: 3, value: true, set_Or_Change: "change");
         }
-        InitCheckDictionary(key: 5, value: true, set_Or_Change: "change");
         return;
     }
     private void EquipmentUIElements() //NOTE: initCheck.Key = 1
@@ -339,13 +341,36 @@ public class ItemMenuManager : MonoBehaviour
 
     public void ChooseCharPanelSetup() //NOTE: initCheck.Key = 3
     {
-        InitCheckDictionary(key: 3, value: false, set_Or_Change: "set");
+        #region "NullChecks"
+        if (instance == null)
+        {
+            Debug.LogError("ItemMenuManager => ChooseCharPanelSetup ==> instance is null!");
+            return;
+        }
+        if (GameManager.instance == null)
+        {
+            Debug.LogError("ItemMenuManager => ChooseCharPanelSetup ==> GameManager.instance is null!");
+            return;
+        }
+        if (PlayerStats.instance == null)
+        {
+            Debug.LogError("ItemMenuManager => ChooseCharPanelSetup ==> PlayerStats.instance is null!");
+            return;
+        }
+        if (MenuManager.instance == null)
+        {
+            Debug.LogError("ItemMenuManager => ChooseCharPanelSetup ==> MenuManager.instance is null!");
+            return;
+        }
+        #endregion
 
+        Debug.Log("ItemMenuManager => ChooseCharPanelSetup ==> Passed null checks.");
         if (GameManager.instance != null && PlayerStats.instance != null && MenuManager.instance != null)
         {
             // Check if the character selection panel is active and not yet updated
             if (MenuManager.instance.MenuCanvasActive && !chooseCharPanelUpdate)
             {
+                Debug.Log("ItemMenuManager => ChooseCharPanelSetup ==> MenuCanvas is active and panel not updated.");
                 PlayerStats[] playerStats = GameManager.instance.GetSortedPlayerStats();
 
                 for (int i = 0; i < chooseCharButtons.Length - 1; i++)
@@ -367,11 +392,12 @@ public class ItemMenuManager : MonoBehaviour
                         Debug.Log($"No player stats for index {i}, hiding button.");
                     }
                 }
+                Debug.Log("Character selection panel updated.");
                 chooseCharPanelUpdate = true;
-                InitCheckDictionary(key: 3, value: true, set_Or_Change: "change");
             }
             else if (MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && !chooseCharPanelUpdate)
             {
+                Debug.Log("ItemMenuManager => ChooseCharPanelSetup ==> MenuCanvas is not active, no update needed.");
                 return;
             }
             // NOTE: If the menu is not active, there is no need to update the panel
