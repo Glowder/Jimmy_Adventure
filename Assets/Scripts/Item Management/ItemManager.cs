@@ -43,10 +43,11 @@ public class ItemManager : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            // instance = this;
             if (Inventory.instance != null)
             {
+                Debug.Log("Item was added -> " + Inventory.instance.itemWasAdded);
                 Inventory.instance.itemWasAdded = false;
+                gameObject.SetActive(false);
                 Inventory.instance.AddItem(this);
                 Debug.Log("Trigger ==> 1 <==");
                 DestroyItem();
@@ -54,27 +55,21 @@ public class ItemManager : MonoBehaviour
             }
             else
             {
-                Debug.Log($"You picked up Inventory.instance is = null!");
+                Debug.Log($"Inventory is = null!");
             }
         }
     }
 
     private void DestroyItem()
     {
-        if (Inventory.instance.GetInventoryItemCount == MenuManager.instance.AvailableInventorySlots && !Inventory.instance.itemWasAdded)
+        if (Inventory.instance.InventoryItemCount == MenuManager.instance.AvailableInventorySlots && !Inventory.instance.itemWasAdded)
             return;
         Destroy(gameObject);
     }
 
 
-    public bool GetIsStackable
-    {
-        get => isStackable;
-    }
-    public int GetMaxStackSize
-    {
-        get => maxStackSize;
-    }
+    public bool IsStackable => isStackable;
+    public int MaxStackSize => maxStackSize;
 
     public int CurrentStackSize
     {

@@ -1,2 +1,48 @@
-To do list for Sachen die I am working on or want to do next.
+To do list for Sachen die I am working on or want to do next and Bugs and fixes.
 
+ASCII-Code for the special chars:
+    ├─ ALT + 192    =>  └
+    ├─ ALT + 195    =>  ├
+    ├─ ALT + 196    =>  ─
+    ├─ ALT + 0216   =>  Ø
+    └─ ALT + 
+
+==========| Git commit text |==========
+
+Add:
+-   
+
+Refractor:
+-   
+
+Changed/Fixed:
+-   
+
+===============================================================================================
+
+==========| To Do |==========
+- Refractor MethodInitializationLogic()
+
+- Refractor and fix item adding and removing logic.
+    ├─  Refractor 
+    ├─  Fix creation of clones in Hierarchy
+    ├─  Removing collider from item
+    └─  Removing 
+===============================================================================================
+==========| Located Bugs |==========
+0001 picking up an item in the scene 'Town' causes the item to be added until the iventory is full:
+    └─  Cause: The picked up item gets destroyed but a clone is created at the same position with the same collider.
+        That causes the trigger to add the item to the inventory again.
+        This process continues until the inventory is full.
+
+0002
+
+
+==========| Solution (if listed here => still in process) |==========
+0001
+    ├─  Stop the creation of clones
+    └─  if not possible, then place the clones outside the map until a solution is found.
+    
+0002
+
+===============================================================================================

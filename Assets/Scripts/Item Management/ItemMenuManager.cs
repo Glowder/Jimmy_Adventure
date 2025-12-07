@@ -58,7 +58,7 @@ public class ItemMenuManager : MonoBehaviour
             Debug.LogError($"The value true is only allowed for change.");
             return;
         }
-        // NOTE: just needs to set a key and its value. The order is not importnant and waht the key is does not matter
+        // NOTE: just needs to set a key and its value. The order is not importnant and waht the key value is, does not matter
         if (set_Or_Change.Equals("set", StringComparison.OrdinalIgnoreCase))
         {
             if (!initCheck.ContainsKey(key))
@@ -86,11 +86,11 @@ public class ItemMenuManager : MonoBehaviour
 
     private void MethodInitializationLogic() //NOTE: Calls various initialization methods if they haven't been called yet for some reason
     {
-        if(MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && mainMenuInitialized)
+        if (MenuManager.instance != null && !MenuManager.instance.MenuCanvasActive && mainMenuInitialized)
         {
             mainMenuInitialized = false;
         }
-        if(MenuManager.instance != null && MenuManager.instance.MenuCanvasActive && !mainMenuInitialized)
+        if (MenuManager.instance != null && MenuManager.instance.MenuCanvasActive && !mainMenuInitialized)
         {
             ChooseCharPanelSetup(); //NOTE: initCheck.Key = 3
             mainMenuInitialized = true;
@@ -415,9 +415,8 @@ public class ItemMenuManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            InitCheckDictionary(key: 0, value: true, set_Or_Change: "change");
         }
-        DontDestroyOnLoad(gameObject);
-        InitCheckDictionary(key: 0, value: true, set_Or_Change: "change");
     }
 
     #region "Getters and Setters"

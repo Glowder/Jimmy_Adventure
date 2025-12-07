@@ -47,6 +47,8 @@ public class Inventory : MonoBehaviour
         Debug.Log($"Total items in inventory: {count}. Free slots: {GetFreeSlotCount()}.");
     }
 
+    // FIND: AddItem
+    // FIXME: ERROR code 0001 - Picking up items causes cloning on the map and duplication in inventory
     public void AddItem(ItemManager item)
     {
         Debug.Log($"===>>> Stack check, at AddItem: {stackableCheckedAndAdded} <<<===");
@@ -76,8 +78,8 @@ public class Inventory : MonoBehaviour
 
     private List<ItemManager> CalculateStackamount(ItemManager item)
     {
-        int totalStack = Mathf.CeilToInt((float)item.CurrentStackSize / item.GetMaxStackSize);
-        int remainder = item.CurrentStackSize % item.GetMaxStackSize;
+        int totalStack = Mathf.CeilToInt((float)item.CurrentStackSize / item.MaxStackSize);
+        int remainder = item.CurrentStackSize % item.MaxStackSize;
         List<ItemManager> dividedStacks = new List<ItemManager>();
         for (int i = 0; i < totalStack; i++)
         {
@@ -88,7 +90,7 @@ public class Inventory : MonoBehaviour
             }
             else
             {
-                newItemStack.CurrentStackSize = item.GetMaxStackSize;
+                newItemStack.CurrentStackSize = item.MaxStackSize;
             }
             dividedStacks.Add(newItemStack);
         }
@@ -96,6 +98,7 @@ public class Inventory : MonoBehaviour
 
     }
 
+    // FIND: AddItem (stacks)
     private void AddStackableItem(ItemManager pickedUpItem)
     {
         stackableCheckedAndAdded = false;
@@ -109,12 +112,12 @@ public class Inventory : MonoBehaviour
                 Debug.Log($"Found existing stack of {pickedUpItem.itemName} in inventory at slot {i + 1}. Stack size: {items[i].CurrentStackSize}");
                 int tempStack = items[i].CurrentStackSize + pickedUpItem.CurrentStackSize;
 
-                if (items[i].CurrentStackSize == items[i].GetMaxStackSize)
+                if (items[i].CurrentStackSize == items[i].MaxStackSize)
                 {
-                    Debug.Log($"{items[i].itemName} stack at slot {i + 1} is already at max size ({items[i].GetMaxStackSize}).");
+                    Debug.Log($"{items[i].itemName} stack at slot {i + 1} is already at max size ({items[i].MaxStackSize}).");
                     continue;
                 }
-                else if (pickedUpItem.CurrentStackSize > pickedUpItem.GetMaxStackSize)
+                else if (pickedUpItem.CurrentStackSize > pickedUpItem.MaxStackSize)
                 {
                     items.AddRange(CalculateStackamount(pickedUpItem));
                     MenuManager.instance.ClearInventoryUI();
@@ -127,7 +130,7 @@ public class Inventory : MonoBehaviour
                     Debug.Log($"Current stack size before adding: {items[i].CurrentStackSize}");
                     // int tempStack = inventarItem.CurrentStackSize + pickedUpItem.CurrentStackSize;
                     Debug.Log($"Temp stack size after adding: {tempStack}");
-                    if (tempStack < items[i].GetMaxStackSize)
+                    if (tempStack < items[i].MaxStackSize)
                     {
                         Debug.Log("Item stack is smaller than max stack size.");
                         items[i].CurrentStackSize = tempStack;
@@ -141,9 +144,9 @@ public class Inventory : MonoBehaviour
                     }
                     else
                     {
-                        items[i].CurrentStackSize = items[i].GetMaxStackSize;
+                        items[i].CurrentStackSize = items[i].MaxStackSize;
                         Debug.Log("Item stack exceeds max stack size.");
-                        int newStackSize = tempStack - items[i].GetMaxStackSize;
+                        int newStackSize = tempStack - items[i].MaxStackSize;
                         Debug.Log($"Stack size: {tempStack}. NewStack: {newStackSize}");
                         if (newStackSize != 0)
                         {
@@ -158,7 +161,7 @@ public class Inventory : MonoBehaviour
                     }
                 }
             }
-            else if (pickedUpItem.isStackable && pickedUpItem.CurrentStackSize > pickedUpItem.GetMaxStackSize)
+            else if (pickedUpItem.IsStackable && pickedUpItem.CurrentStackSize > pickedUpItem.MaxStackSize)
             {
                 items.AddRange(CalculateStackamount(pickedUpItem));
                 MenuManager.instance.ClearInventoryUI();
@@ -170,17 +173,26 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    // FIND: AddItemToNewSlot
     private void AddItemToNewSlot(ItemManager item, int stackSize)
     {
+        Debug.Log("Item count is : " + items.Count);
         if (items.Count < MenuManager.instance.AvailableInventorySlots)
         {
+            Debug.Log("Adding item -> Step 1");
             ItemManager newItem = Instantiate(item);
             newItem.CurrentStackSize = stackSize;
             items.Add(newItem);
+            Debug.Log("Adding item -> Step 2");
             UpdateInventoryUI(inventorySlot: items.Count - 1, stackSize: newItem.CurrentStackSize);
             itemWasAdded = true;
-            //TEMP: this line is just temporary for testing
+            Debug.Log("Adding item -> Step 3");
+            //TEMP: START
+            // NOTE: temporary code, remove later
             Debug.Log($"Added {item.itemName} to empty position in Inventory with stack size: {newItem.CurrentStackSize}.");
+            newItem = null;
+            Debug.Log("Adding item -> Step 4");
+            //TEMP: END
             return;
         }
     }
@@ -306,7 +318,7 @@ public class Inventory : MonoBehaviour
             details.consumableDetails.SetActive(true);
             details.miscellaneousDetails.SetActive(false);
             MenuManager.instance.SetEquipOrUseButtonText("USE");
-            details.itemCountConsume.text = item.CurrentStackSize.ToString() + " / " + item.GetMaxStackSize.ToString();
+            details.itemCountConsume.text = item.CurrentStackSize.ToString() + " / " + item.MaxStackSize.ToString();
             details.itemNameConsume.text = item.itemName;
             details.itemDescriptionConsume.text = item.itemDescription;
             details.itemEffectDescriptionConsume.text = item.itemEffectDescription;
@@ -571,5 +583,5 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public int GetInventoryItemCount => items.Count;
+    public int InventoryItemCount => items.Count;
 }

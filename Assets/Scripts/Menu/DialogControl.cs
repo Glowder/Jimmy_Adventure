@@ -8,21 +8,10 @@ public class DialogControl : MonoBehaviour
   public static DialogControl instance;
   [SerializeField] GameObject testPortrait;
   [SerializeField] public TextMeshProUGUI testText, dialogText, nameText;
+  [SerializeField]public GameObject dialogBox, dialogWithNameBox, interactionIcon, portraitBox, portraitImage, dialogTextBox, nameTextBox;
 
-  #region Dialog UI GameObjects
-  [SerializeField]
-  public GameObject
-                                      dialogBox,
-                                      dialogWithNameBox,
-                                      interactionIcon,
-                                      portraitBox,
-                                      portraitImage,
-                                      dialogTextBox,
-                                      nameTextBox;
-  #endregion
-  // [SerializeField] public int currentDialogIndex, dialogLength;
   [SerializeField] string[] dialog;
-  // Start is called once before the first execution of Update after the MonoBehaviour is created
+
   void Start()
   {
     CreateInstance();
@@ -37,10 +26,6 @@ public class DialogControl : MonoBehaviour
       {
         if (NPCStats.instance != null)
           NPCStats.instance.ActivateNPCDialog();
-
-        // Debug.Log("Dialog length = " + DialogHandler.instance.GetDialogLength());
-        // Debug.Log("Gameobject with instance of DebugHandler: " + DialogHandler.instance.gameObject.name);
-
       }
     }
 
