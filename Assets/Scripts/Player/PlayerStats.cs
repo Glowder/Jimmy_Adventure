@@ -246,24 +246,15 @@ public class PlayerStats : MonoBehaviour
   #region "Getters and Setters"
 
   public int PlayerGroupPositionNumber => groupPositionNumber;
-  public int MaxEquipmentSlots
-  {
-    get => maxEquipmentSlots;
-  }
+  public int MaxEquipmentSlots => maxEquipmentSlots;
   public int CritChance
   {
     get => crit;
     set => crit = value;
   }
-  public string PlayerName
-  {
-    get => playerName;
-  }
+  public string PlayerName => playerName;
 
-  public Sprite PlayerPortrait
-  {
-    get => playerPortrait;
-  }
+  public Sprite PlayerPortrait => playerPortrait;
 
   public int Health
   {
@@ -295,10 +286,7 @@ public class PlayerStats : MonoBehaviour
     set => dexterity = value;
   }
 
-  public string PlayerClass
-  {
-    get => playerClass;
-  }
+  public string PlayerClass => playerClass;
   public int MaxHealth
   {
     get => maxHP;
@@ -329,10 +317,7 @@ public class PlayerStats : MonoBehaviour
     get => magicDEF;
     set => magicDEF = value;
   }
-  public int MaxLevel
-  {
-    get => maxLevel;
-  }
+  public int MaxLevel => maxLevel;
   public int PhysicalEvasion
   {
     get => physicalEvasion;
